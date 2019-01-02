@@ -162,9 +162,9 @@ internal object PhotoUtil {
      */
     fun path2Bitmap(context: Context, filePath: String): Bitmap? {
         var uri = FileUtils.getUriForFile(context, File(filePath))
-        uri?.let { u ->
-            return MediaStore.Images.Media.getBitmap(context.contentResolver, u)
-        }?.run {
+        if (uri != null) {
+            return MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+        } else {
             return null
         }
     }

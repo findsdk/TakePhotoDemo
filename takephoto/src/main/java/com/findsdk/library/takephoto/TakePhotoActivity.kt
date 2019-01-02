@@ -5,6 +5,7 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.widget.Toast
 import com.findsdk.library.rxbus.OnEventListener
@@ -114,38 +115,43 @@ class TakePhotoActivity : Activity() {
     }
 
     private fun initView(savedInstanceState: Bundle?) {
-        intent?.let {
+        if (intent != null) {
             val key = intent.getIntExtra(KEY_TYPE, -1)
             val width = intent.getIntExtra(KEY_WIDTH, -1)
             val height = intent.getIntExtra(KEY_HEIGHT, -1)
             when (key) {
-                PhotoHelper.REQUEST_CODE_TAKE_PHOTO -> PhotoHelper.getInstance(this).takePhoto(this)
-                PhotoHelper.REQUEST_CODE_TAKE_PHOTO_WITH_CROP -> PhotoHelper.getInstance(this).takePhotoWithCrop(
-                    this,
+                PhotoHelper.REQUEST_CODE_TAKE_PHOTO -> PhotoHelper.getInstance(this@TakePhotoActivity).takePhoto(this@TakePhotoActivity)
+                PhotoHelper.REQUEST_CODE_TAKE_PHOTO_WITH_CROP -> PhotoHelper.getInstance(this@TakePhotoActivity).takePhotoWithCrop(
+                    this@TakePhotoActivity,
                     width,
                     height
                 )
-                PhotoHelper.REQUEST_CODE_SELECT_FROM_GALLERY -> PhotoHelper.getInstance(this).pickFromGallery(this)
-                PhotoHelper.REQUEST_CODE_SELECT_FROM_GALLERY_WITH_CROP -> PhotoHelper.getInstance(this).pickFromGalleryWithCrop(
-                    this,
+                PhotoHelper.REQUEST_CODE_SELECT_FROM_GALLERY -> PhotoHelper.getInstance(this@TakePhotoActivity).pickFromGallery(
+                    this@TakePhotoActivity
+                )
+                PhotoHelper.REQUEST_CODE_SELECT_FROM_GALLERY_WITH_CROP -> PhotoHelper.getInstance(this@TakePhotoActivity).pickFromGalleryWithCrop(
+                    this@TakePhotoActivity,
                     width,
                     height
                 )
-                PhotoHelper.REQUEST_CODE_SELECT_FROM_FILE -> PhotoHelper.getInstance(this).pickFromFile(this)
-                PhotoHelper.REQUEST_CODE_SELECT_FROM_FILE_WITH_CROP -> PhotoHelper.getInstance(this).pickFromFileWithCrop(
-                    this,
+                PhotoHelper.REQUEST_CODE_SELECT_FROM_FILE -> PhotoHelper.getInstance(this@TakePhotoActivity).pickFromFile(
+                    this@TakePhotoActivity
+                )
+                PhotoHelper.REQUEST_CODE_SELECT_FROM_FILE_WITH_CROP -> PhotoHelper.getInstance(this@TakePhotoActivity).pickFromFileWithCrop(
+                    this@TakePhotoActivity,
                     width,
                     height
                 )
                 else -> finish()
+
             }
-        }?.run {
+        } else {
             finish()
         }
     }
 
     private fun <U> addRxBusSubscribe(eventType: Class<U>, listener: OnEventListener<U>) {
-        if(compositeDisposable == null){
+        if (compositeDisposable == null) {
             compositeDisposable = CompositeDisposable()
         }
         RxBusHelper.doOnThreadMode(eventType, compositeDisposable, listener)
@@ -154,7 +160,7 @@ class TakePhotoActivity : Activity() {
     private fun initData() {
         addRxBusSubscribe(Uri::class.java, object : OnEventListener<Uri>() {
             override fun onEvent(uri: Uri) {
-                if (!TextUtils.isEmpty(uri.toString())) {
+                if (uri != null) {
                     getPhoto(uri)
                 } else {
                     finish()
@@ -181,10 +187,8 @@ class TakePhotoActivity : Activity() {
     }
 
     private fun hideProgressBar() {
-        progressDialog?.let {
-            if (it.isShowing) {
-                it.dismiss()
-            }
+        if (progressDialog != null) {
+            if (progressDialog!!.isShowing) progressDialog!!.dismiss()
             progressDialog = null
         }
     }
@@ -233,9 +237,10 @@ class TakePhotoActivity : Activity() {
     override fun onDestroy() {
         super.onDestroy()
         hideProgressBar()
-        compositeDisposable?.let {
-            it.dispose()
+        if (compositeDisposable != null) {
+            compositeDisposable!!.dispose()
             compositeDisposable = null
         }
+
     }
 }

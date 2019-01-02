@@ -12,6 +12,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 class MainActivity : AppCompatActivity() {
 
     var bitmap: Bitmap? = null
+    val width = 300
+    val height = 300
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -42,7 +44,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun takePhotoWithCrop() {
-        TakePhotoActivity.takePhotoWithCrop(this, 300, 300, 101)
+        TakePhotoActivity.takePhotoWithCrop(this, width, height, 101)
     }
 
     private fun pickPictureFromGallery() {
@@ -50,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun pickPictureFromGalleryWithCrop() {
-        TakePhotoActivity.pickPictureFromGalleryWithCrop(this, 300, 300, 201)
+        TakePhotoActivity.pickPictureFromGalleryWithCrop(this, width, height, 201)
     }
 
     private fun pickPictureFromFile() {
@@ -58,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun pickPictureFromFileWithCrop() {
-        TakePhotoActivity.pickPictureFromFileWithCrop(this, 300, 300, 301)
+        TakePhotoActivity.pickPictureFromFileWithCrop(this, width, height, 301)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

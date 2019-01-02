@@ -19,6 +19,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Function
 import io.reactivex.functions.Predicate
 import io.reactivex.schedulers.Schedulers
+
 import java.io.File
 import java.util.*
 
@@ -75,7 +76,7 @@ internal class PhotoHelper(var context: Context) {
     /**
      * 图片路径
      */
-    private var cameraTmpFile: File?=null
+    private var cameraTmpFile: File? = null
     /**
      * 是否裁剪的标志位
      */
