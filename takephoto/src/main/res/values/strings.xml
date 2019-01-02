@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">takephoto</string>
+    <string name="setting">设置</string>
+    <string name="request_permissions_external_storage_tips">没有读写文件权限，为了完全使用此APP，请给予读写文件权限</string>
+    <string name="request_permissions_camera_tips">没有相机权限，为了完全使用此APP，请给予相机权限</string>
+
+    <string name="no_sd_card">没有SD卡</string>
+    <string name="dir_create_failure">文件夹创建失败</string>
+    <string name="no_camera">没有相机</string>
+</resources>

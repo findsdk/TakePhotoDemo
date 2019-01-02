@@ -1,0 +1,5 @@
+<resources>
+    <style name="PhotoModuleAlertDialog" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+
+    </style>
+</resources>
