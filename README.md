@@ -93,4 +93,4 @@ lastVersion ：0.0.5
 
 6、其他事项
 
-    联系：findsdk@gmail.com
+    email：findsdk@gmail.com
