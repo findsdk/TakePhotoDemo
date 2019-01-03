@@ -1,10 +1,10 @@
 # TakePhotoDemo
-当前版本：0.0.5
+lastVersion ：0.0.5
 
 1、拍照、选照片库
 包括调用系统相机拍照、剪切、从文件选照片、从相册选照片
 
-    implementation 'com.findsdk.library:takephoto:lastVersion'
+    implementation 'com.findsdk.library:takephoto:${lastVersion}'
 
 2、api:
 
