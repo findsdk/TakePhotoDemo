@@ -2,6 +2,7 @@
 1、拍照、选照片库
 包括调用系统相机拍照、剪切、从文件选照片、从相册选照片
 
+
 2、api:
 
 fun takePhoto(context: Activity, requestCode: Int)
@@ -18,6 +19,7 @@ fun pickPictureFromFileWithCrop(context: Activity, width: Int, height: Int, requ
 
 
 3、使用方法：
+
 private fun takePhoto() {
     TakePhotoActivity.takePhoto(this, 100)
 }
@@ -42,7 +44,9 @@ private fun pickPictureFromFileWithCrop() {
     TakePhotoActivity.pickPictureFromFileWithCrop(this, width, height, 301)
 }
 
+
 //获取照片
+
 override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
     if (resultCode == Activity.RESULT_OK && data != null) {
@@ -57,6 +61,7 @@ override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) 
         }
     }
 }
+
 
 4、多语言和临时文件目录
 
