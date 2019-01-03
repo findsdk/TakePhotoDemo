@@ -13,6 +13,7 @@ import android.widget.Toast
 import com.findsdk.library.fileprovider.FileUtils
 import com.findsdk.library.rxbus.RxBusHelper
 import com.findsdk.library.takephoto.R
+import com.findsdk.library.takephoto.TakePhotoConfig
 import io.reactivex.Observable
 import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -214,17 +215,17 @@ internal class PhotoHelper(var context: Context) {
      * @param activity Activity
      */
     private fun startCamera(activity: Activity) {
-        path = FileUtils.getBasePath(activity).absolutePath // 图片保存路径
+        path = PhotoUtil.getTempPath(activity).absolutePath // 图片保存路径
         fileName = Random().nextInt().toString() + "tmp.jpg"
         cameraTmpFile = File(path, fileName)
-        if (!SDCardUtil.isSDCardEnable()) {
-            showToast(activity, activity.getString(R.string.no_sd_card))
+        if (!StorageUtil.isSDCardEnable()) {
+            showToast(activity, TakePhotoConfig.languageNoSDCard)
             return
         }
         val folder = File(path)
         if (!folder.exists()) {
             if (!folder.mkdirs()) {
-                showToast(activity, activity.getString(R.string.dir_create_failure))
+                showToast(activity, TakePhotoConfig.languageDirCreateFailure)
                 return
             }
         }
@@ -243,7 +244,7 @@ internal class PhotoHelper(var context: Context) {
     private fun captureWithCrop(activity: Activity, outputUri: Uri) {
         this.outputUri = outputUri
         if (Build.VERSION.SDK_INT >= 23) {
-            this.tempUri = FileUtils.getTempUri(activity)
+            this.tempUri = PhotoUtil.getTempUri(activity)
         } else {
             this.tempUri = outputUri
         }
@@ -271,7 +272,7 @@ internal class PhotoHelper(var context: Context) {
     private fun captureBySafely(activity: Activity, intent: Intent): Boolean {
         val result = activity.packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL)
         if (result.isEmpty()) {
-            showToast(activity, activity.getString(R.string.no_camera))
+            showToast(activity, TakePhotoConfig.languageNoCamera)
             return false
         } else {
             return true
@@ -414,7 +415,7 @@ internal class PhotoHelper(var context: Context) {
     private fun showPermissionDialog(activity: Activity, message: String) {
         val builder = AlertDialog.Builder(activity, R.style.PhotoModuleAlertDialog)
         builder.setMessage(message)
-        builder.setPositiveButton(R.string.setting) { dialogInterface, i ->
+        builder.setPositiveButton(TakePhotoConfig.languageSetting) { dialogInterface, i ->
             val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             intent.data = Uri.parse("package:" + activity.packageName)
             activity.startActivity(intent)
@@ -431,7 +432,7 @@ internal class PhotoHelper(var context: Context) {
      */
     private fun startPick(activity: Activity) {
         if (isCrop) {
-            path = FileUtils.getBasePath(activity).absolutePath // 图片保存路径
+            path = PhotoUtil.getTempPath(activity).absolutePath // 图片保存路径
             fileName = Random().nextInt().toString() + "tmp.jpg"
             cameraTmpFile = File(path, fileName)
             //            File file = new File(Environment.getExternalStorageDirectory(), "/.tmp/" + "tmp.jpg");
@@ -515,7 +516,7 @@ internal class PhotoHelper(var context: Context) {
                     if (ret)
                         startCamera(activity)
                     else {
-                        showPermissionDialog(activity, activity.getString(R.string.request_permissions_camera_tips))
+                        showPermissionDialog(activity, TakePhotoConfig.languageRequestPermissionsCameraTips)
                     }
                 }
                 REQUEST_PERMISSION_CUSTOM_CAMERA -> {
@@ -528,7 +529,7 @@ internal class PhotoHelper(var context: Context) {
                     if (ret)
                         startCustomCamera(activity, false)
                     else {
-                        showPermissionDialog(activity, activity.getString(R.string.request_permissions_camera_tips))
+                        showPermissionDialog(activity, TakePhotoConfig.languageRequestPermissionsCameraTips)
                     }
                 }
                 REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE -> {
@@ -543,7 +544,7 @@ internal class PhotoHelper(var context: Context) {
                     else {
                         showPermissionDialog(
                             activity,
-                            activity.getString(R.string.request_permissions_external_storage_tips)
+                            TakePhotoConfig.languageRequestPermissionsExternalStorageTips
                         )
                     }
                 }
@@ -553,17 +554,17 @@ internal class PhotoHelper(var context: Context) {
     }
 
     private fun startCustomCamera(activity: Activity, useBackCamera: Boolean) {
-        path = FileUtils.getBasePath(activity).absolutePath // 图片保存路径
+        path = PhotoUtil.getTempPath(activity).absolutePath // 图片保存路径
         fileName = Random().nextInt().toString() + "tmp.jpg"
         cameraTmpFile = File(path, fileName)
-        if (!SDCardUtil.isSDCardEnable()) {
-            showToast(activity, activity.getString(R.string.no_sd_card))
+        if (!StorageUtil.isSDCardEnable()) {
+            showToast(activity, TakePhotoConfig.languageNoSDCard)
             return
         }
         val folder = File(path)
         if (!folder.exists()) {
             if (!folder.mkdirs()) {
-                showToast(activity, activity.getString(R.string.dir_create_failure))
+                showToast(activity, TakePhotoConfig.languageDirCreateFailure)
                 return
             }
         }
@@ -636,7 +637,7 @@ internal class PhotoHelper(var context: Context) {
     private fun captureWithCropByCustom(activity: Activity, outputUri: Uri, useBackCamera: Boolean) {
         this.outputUri = outputUri
         if (Build.VERSION.SDK_INT >= 23) {
-            this.tempUri = FileUtils.getTempUri(activity)
+            this.tempUri = PhotoUtil.getTempUri(activity)
         } else {
             this.tempUri = outputUri
         }

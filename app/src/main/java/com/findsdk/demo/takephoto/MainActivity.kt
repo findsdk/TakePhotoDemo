@@ -5,7 +5,9 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.findsdk.library.takephoto.TakePhotoActivity
+import com.findsdk.library.takephoto.TakePhotoConfig
 import com.findsdk.library.takephoto.TakePhotoUtil
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -37,6 +39,15 @@ class MainActivity : AppCompatActivity() {
         pick_from_file_crop.setOnClickListener {
             pickPictureFromFileWithCrop()
         }
+
+        TakePhotoConfig.photoDirectoryName = "tmp"
+        TakePhotoConfig.languageSetting = "setting"
+        TakePhotoConfig.languageDirCreateFailure = "dir create fail"
+        TakePhotoConfig.languageNoCamera = "no camera"
+        TakePhotoConfig.languageNoSDCard = "no sd card"
+        TakePhotoConfig.languageRequestPermissionsCameraTips = "相机权限"
+        TakePhotoConfig.languageRequestPermissionsExternalStorageTips = "文件权限"
+
     }
 
     private fun takePhoto() {
@@ -70,6 +81,7 @@ class MainActivity : AppCompatActivity() {
                 100,
                 101, 200, 201, 300, 301 -> {
                     val uri = data.data
+                    Log.e("===", "===uri ${uri}")
                     bitmap = TakePhotoUtil.uri2Bitmap(this, uri)
                     if (bitmap != null) {
                         image1.setImageBitmap(bitmap)
@@ -84,5 +96,10 @@ class MainActivity : AppCompatActivity() {
 //                }
             }
         }
+    }
+
+    override fun onDestroy() {
+        TakePhotoConfig.clearCache(this)
+        super.onDestroy()
     }
 }

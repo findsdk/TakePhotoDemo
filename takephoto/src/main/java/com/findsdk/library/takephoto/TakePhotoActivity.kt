@@ -5,11 +5,11 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.widget.Toast
 import com.findsdk.library.rxbus.OnEventListener
 import com.findsdk.library.rxbus.RxBusHelper
+import com.findsdk.library.takephoto.util.LocaleUtil
 import com.findsdk.library.takephoto.util.PhotoHelper
 import io.reactivex.Observer
 import io.reactivex.disposables.CompositeDisposable
@@ -110,6 +110,7 @@ class TakePhotoActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        LocaleUtil.initLocale(this)
         initView(savedInstanceState)
         initData()
     }

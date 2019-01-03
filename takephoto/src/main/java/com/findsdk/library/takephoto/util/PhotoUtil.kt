@@ -16,28 +16,35 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.text.TextUtils
 import com.findsdk.library.fileprovider.FileUtils
+import com.findsdk.library.takephoto.TakePhotoConfig
 import java.io.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Created by bvb on 2016/10/26.
  */
 internal object PhotoUtil {
-    /**
-     * 创建临时文件
-     * @param context Context
-     * @return File
-     * @throws IOException
-     */
-    @Throws(IOException::class)
-    fun createImageFile(context: Context): File {
 
-        val fileName = "temp_" + System.currentTimeMillis()
-        val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-            fileName, /* prefix */
-            ".jpg", /* suffix */
-            storageDir      /* directory */
-        )
+    fun getTempUri(context: Context): Uri {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val file =
+            File(Environment.getExternalStorageDirectory(), "/${TakePhotoConfig.photoDirectoryName}/$timeStamp.jpg")
+        if (file != null && file.parentFile != null && !file.parentFile.exists())
+            file.parentFile.mkdirs()
+        return FileUtils.getUriForFile(context, file)
+    }
+
+    fun getTempPath(context: Context): File {
+        val dir = (Environment
+            .getExternalStorageDirectory().toString()
+                + "/${TakePhotoConfig.photoDirectoryName}/")
+
+        val f = File(dir)
+        if (f != null && !f.exists()) {
+            f.mkdirs()
+        }
+        return f
     }
 
     /**
