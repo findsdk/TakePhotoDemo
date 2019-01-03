@@ -86,3 +86,11 @@
         TakePhotoConfig.clearCache(this)
         super.onDestroy()
     }
+    
+5、混淆
+
+    -keep class com.findsdk.library.**{*;}
+
+6、其他事项
+
+    联系：findsdk@gmail.com
