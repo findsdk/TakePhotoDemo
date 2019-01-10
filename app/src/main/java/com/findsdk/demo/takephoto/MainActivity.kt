@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         TakePhotoConfig.languageDirCreateFailure = "dir create fail"
         TakePhotoConfig.languageNoCamera = "no camera"
         TakePhotoConfig.languageNoSDCard = "no sd card"
+        TakePhotoConfig.languageNotImage = "not image"
         TakePhotoConfig.languageRequestPermissionsCameraTips = "相机权限"
         TakePhotoConfig.languageRequestPermissionsExternalStorageTips = "文件权限"
 
