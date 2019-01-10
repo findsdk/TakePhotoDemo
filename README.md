@@ -1,5 +1,5 @@
 # TakePhotoDemo
-lastVersion ：0.0.5
+lastVersion ：0.0.6
 
 1、拍照、选照片库
 包括调用系统相机拍照、剪切、从文件选照片、从相册选照片
@@ -78,9 +78,11 @@ lastVersion ：0.0.5
     TakePhotoConfig.languageDirCreateFailure = "dir create fail"
     TakePhotoConfig.languageNoCamera = "no camera"
     TakePhotoConfig.languageNoSDCard = "no sd card"
+    TakePhotoConfig.languageNotImage = "not Image"
     TakePhotoConfig.languageRequestPermissionsCameraTips = "相机权限"
     TakePhotoConfig.languageRequestPermissionsExternalStorageTips = "文件权限"
 
+    
     可以在activity退出时 删除拍照的临时文件
     override fun onDestroy() {
         TakePhotoConfig.clearCache(this)
