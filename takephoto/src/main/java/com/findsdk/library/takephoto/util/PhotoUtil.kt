@@ -479,5 +479,20 @@ internal object PhotoUtil {
         }
     }
 
+//    fun isImageFile(context: Context, uri: Uri): Boolean {
+//        var filePath: String? = FileUtils.getFilePathWithUri(context, uri) ?: return false
+//        val options = BitmapFactory.Options()
+//        options.inJustDecodeBounds = true
+//        BitmapFactory.decodeFile(filePath, options)
+//        return options.outWidth !== -1
+//    }
 
+
+    fun isImageFile(context: Context, filePath: String?): Boolean {
+        if (filePath == null) return false
+        val options = BitmapFactory.Options()
+        options.inJustDecodeBounds = true
+        BitmapFactory.decodeFile(filePath, options)
+        return options.outWidth !== -1
+    }
 }

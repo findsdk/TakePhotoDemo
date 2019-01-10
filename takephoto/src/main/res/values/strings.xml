@@ -7,4 +7,5 @@
     <string name="no_sd_card">没有SD卡</string>
     <string name="dir_create_failure">文件夹创建失败</string>
     <string name="no_camera">没有相机</string>
+    <string name="not_image">文件格式错误</string>
 </resources>

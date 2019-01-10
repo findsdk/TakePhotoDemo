@@ -1,6 +1,7 @@
 package com.findsdk.library.takephoto
 
 import android.app.Activity
+import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Intent
 import android.net.Uri
@@ -9,6 +10,7 @@ import android.text.TextUtils
 import android.widget.Toast
 import com.findsdk.library.rxbus.OnEventListener
 import com.findsdk.library.rxbus.RxBusHelper
+import com.findsdk.library.takephoto.util.ErrorEvent
 import com.findsdk.library.takephoto.util.LocaleUtil
 import com.findsdk.library.takephoto.util.PhotoHelper
 import io.reactivex.Observer
@@ -21,7 +23,7 @@ import io.reactivex.disposables.Disposable
 class TakePhotoActivity : Activity() {
 
     var compositeDisposable: CompositeDisposable? = null
-    var progressDialog: ProgressDialog? = null
+    var progressDialog: Dialog? = null
 
     companion object {
         private const val KEY_TYPE = "type"
@@ -169,16 +171,28 @@ class TakePhotoActivity : Activity() {
             }
 
             override fun onError(e: Throwable) {
+                finish()
+            }
+        })
+        addRxBusSubscribe(ErrorEvent::class.java, object : OnEventListener<ErrorEvent>() {
+            override fun onEvent(uri: ErrorEvent) {
+                finish()
+            }
 
+            override fun onError(e: Throwable) {
+                finish()
             }
         })
     }
 
-    private fun showProgressBar(text: String) {
+    private fun showProgressBar() {
         try {
-            progressDialog = ProgressDialog(this, R.style.PhotoModuleProgressDialog)
+            if (TakePhotoConfig.dialog != null) {
+                progressDialog = TakePhotoConfig.dialog
+            }
+            if (progressDialog == null)
+                progressDialog = Dialog(this, R.style.PhotoModuleProgressDialog)
             progressDialog?.let {
-                it.setMessage(text)
                 it.show()
             }
         } catch (e: Exception) {
@@ -200,7 +214,7 @@ class TakePhotoActivity : Activity() {
     }
 
     private fun getPhoto(uri: Uri) {
-        showProgressBar("")
+        showProgressBar()
         PhotoHelper.getInstance(this).compress(this, uri, object : Observer<Uri> {
             override fun onSubscribe(d: Disposable) {
 
@@ -222,6 +236,7 @@ class TakePhotoActivity : Activity() {
                 hideProgressBar()
                 finish()
             }
+
         })
     }
 

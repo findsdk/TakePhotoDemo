@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import com.findsdk.library.fileprovider.FileUtils
 import com.findsdk.library.rxbus.RxBusHelper
@@ -719,31 +720,60 @@ internal class PhotoHelper(var context: Context) {
                     postResult(Uri.fromFile(cameraTmpFile))
                     cameraTmpFile = null
                 }
-                //从相册选择照片并裁剪
-                Constants.TAKE_GALLERY_WITH_CROP -> onCrop(activity, data!!.data, cropUri!!, cropOptions!!)
                 //从相册选择照片不裁剪
                 Constants.TAKE_GALLERY -> {
-                    val uri = Uri.fromFile(FileUtils.getFileWithUri(activity, data!!.data!!))
-                    postResult(uri)
+                    val uri = data!!.data
+                    val filePath = FileUtils.getFilePathWithUri(activity, uri)
+                    if (!PhotoUtil.isImageFile(activity, filePath)) {
+                        notImageFile(activity)
+                        return
+                    }
+                    val uri1 = Uri.fromFile(File(filePath))
+                    postResult(uri1)
+                }
+                //从相册选择照片并裁剪
+                Constants.TAKE_GALLERY_WITH_CROP -> {
+                    val uri = data!!.data
+                    val filePath = FileUtils.getFilePathWithUri(activity, uri)
+                    if (!PhotoUtil.isImageFile(activity, filePath)) {
+                        notImageFile(activity)
+                        return
+                    }
+                    onCrop(activity, uri, cropUri!!, cropOptions!!)
                 }
                 //从文件选择照片不裁剪
                 Constants.TAKE_FILE -> {
-                    val filePath = FileUtils.getFilePathWithDocumentsUri(activity, data!!.data)
-                    val uri = Uri.fromFile(File(filePath))
-                    postResult(uri)
+                    val uri = data!!.data
+                    val filePath = FileUtils.getFilePathWithDocumentsUri(activity, uri)
+                    if (!PhotoUtil.isImageFile(activity, filePath)) {
+                        notImageFile(activity)
+                        return
+                    }
+                    val uri1 = Uri.fromFile(File(filePath))
+                    postResult(uri1)
                 }
                 //从文件选择照片，并裁剪
                 Constants.TAKE_FILE_WITH_CROP -> {
-                    onCrop(activity, data!!.data, cropUri!!, cropOptions!!)
+                    val uri = data!!.data
+                    val filePath = FileUtils.getFilePathWithDocumentsUri(activity, uri)
+                    if (!PhotoUtil.isImageFile(activity, filePath)) {
+                        notImageFile(activity)
+                        return
+                    }
+                    onCrop(activity, uri, cropUri!!, cropOptions!!)
                 }
             }
         } else if (resultCode == Activity.RESULT_CANCELED) {
-            postResult(Uri.parse(""))
+            RxBusHelper.post(ErrorEvent())
         }
     }
 
     private fun postResult(uri: Uri) {
-        //        Log.e("PhotoHelper Post Uri : ", uri.toString());
         RxBusHelper.post(uri)
+    }
+
+    private fun notImageFile(activity: Activity) {
+        showToast(activity, TakePhotoConfig.languageNotImage)
+        RxBusHelper.post(ErrorEvent())
     }
 }

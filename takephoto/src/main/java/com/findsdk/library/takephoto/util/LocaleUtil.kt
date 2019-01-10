@@ -33,6 +33,10 @@ internal object LocaleUtil {
             TakePhotoConfig.languageNoCamera = context.getString(R.string.no_camera)
         }
 
+        if (TakePhotoConfig.languageNotImage.isEmpty()) {
+            TakePhotoConfig.languageNotImage = context.getString(R.string.not_image)
+        }
+
         if (TakePhotoConfig.photoDirectoryName.isEmpty()) {
             TakePhotoConfig.photoDirectoryName = "tmp_images"
         }

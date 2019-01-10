@@ -1,5 +1,6 @@
 package com.findsdk.library.takephoto
 
+import android.app.Dialog
 import android.content.Context
 import com.findsdk.library.takephoto.util.StorageUtil
 
@@ -22,6 +23,9 @@ object TakePhotoConfig {
 
     var languageNoCamera: String = ""
 
+    var languageNotImage: String = ""
+
+    var dialog: Dialog? = null
 
     fun clearCache(context: Context) {
         if (photoDirectoryName.isNotEmpty()) {
