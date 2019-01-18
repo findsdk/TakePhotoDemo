@@ -17,7 +17,7 @@ object TakePhotoUtil {
      * @return Bitmap?
      */
     fun uri2Bitmap(context: Context, uri: Uri): Bitmap? {
-        var filePath = FileUtils.getFilePathWithUri(context, uri)
+        val filePath = FileUtils.getFilePathWithUri(context, uri)
         return PhotoUtil.path2Bitmap(context, filePath)
 
     }
@@ -28,7 +28,7 @@ object TakePhotoUtil {
      * @param uri Uri
      * @return String?
      */
-    fun uri2FilePath(context: Context, uri: Uri): String? {
+    private fun uri2FilePath(context: Context, uri: Uri): String? {
         return FileUtils.getFilePathWithUri(context, uri)
     }
 

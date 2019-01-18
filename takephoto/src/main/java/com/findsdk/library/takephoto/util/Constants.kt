@@ -41,6 +41,12 @@ internal object Constants {
      */
     const val USE_CUSTOM_CAMERA_WITH_CROP = USE_CUSTOM_CAMERA + 1
 
+    /**
+     * 广播action
+     */
+    const val ACTION_PHOTO_RESULT = "com.findsdk.library.takephoto.result"
+
+    const val ACTION_PHOTO_COMPRESS = "com.findsdk.library.takephoto.compress"
 
     /**
      * 图片尺寸
@@ -60,6 +66,8 @@ internal object Constants {
         companion object {
             const val CAMERA_FACING_TYPE = "camera_facing_type"
             const val EXTRA_OUTPUT = "output"
+
+            const val ERROR_MESSAGE = "error_message"
         }
     }
 

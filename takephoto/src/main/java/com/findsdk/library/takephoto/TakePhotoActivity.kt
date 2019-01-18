@@ -2,28 +2,24 @@ package com.findsdk.library.takephoto
 
 import android.app.Activity
 import android.app.Dialog
-import android.app.ProgressDialog
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.Toast
-import com.findsdk.library.rxbus.OnEventListener
-import com.findsdk.library.rxbus.RxBusHelper
-import com.findsdk.library.takephoto.util.ErrorEvent
+import com.findsdk.library.takephoto.util.Constants
 import com.findsdk.library.takephoto.util.LocaleUtil
 import com.findsdk.library.takephoto.util.PhotoHelper
-import io.reactivex.Observer
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 
 /**
  * Created by bvb on 2018/12/28.
  */
 class TakePhotoActivity : Activity() {
 
-    var compositeDisposable: CompositeDisposable? = null
-    var progressDialog: Dialog? = null
+    private var progressDialog: Dialog? = null
 
     companion object {
         private const val KEY_TYPE = "type"
@@ -112,35 +108,35 @@ class TakePhotoActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        register()
         LocaleUtil.initLocale(this)
-        initView(savedInstanceState)
-        initData()
+        initView()
     }
 
-    private fun initView(savedInstanceState: Bundle?) {
+    private fun initView() {
         if (intent != null) {
             val key = intent.getIntExtra(KEY_TYPE, -1)
             val width = intent.getIntExtra(KEY_WIDTH, -1)
             val height = intent.getIntExtra(KEY_HEIGHT, -1)
             when (key) {
-                PhotoHelper.REQUEST_CODE_TAKE_PHOTO -> PhotoHelper.getInstance(this@TakePhotoActivity).takePhoto(this@TakePhotoActivity)
-                PhotoHelper.REQUEST_CODE_TAKE_PHOTO_WITH_CROP -> PhotoHelper.getInstance(this@TakePhotoActivity).takePhotoWithCrop(
+                PhotoHelper.REQUEST_CODE_TAKE_PHOTO -> PhotoHelper.takePhoto(this@TakePhotoActivity)
+                PhotoHelper.REQUEST_CODE_TAKE_PHOTO_WITH_CROP -> PhotoHelper.takePhotoWithCrop(
                     this@TakePhotoActivity,
                     width,
                     height
                 )
-                PhotoHelper.REQUEST_CODE_SELECT_FROM_GALLERY -> PhotoHelper.getInstance(this@TakePhotoActivity).pickFromGallery(
+                PhotoHelper.REQUEST_CODE_SELECT_FROM_GALLERY -> PhotoHelper.pickFromGallery(
                     this@TakePhotoActivity
                 )
-                PhotoHelper.REQUEST_CODE_SELECT_FROM_GALLERY_WITH_CROP -> PhotoHelper.getInstance(this@TakePhotoActivity).pickFromGalleryWithCrop(
+                PhotoHelper.REQUEST_CODE_SELECT_FROM_GALLERY_WITH_CROP -> PhotoHelper.pickFromGalleryWithCrop(
                     this@TakePhotoActivity,
                     width,
                     height
                 )
-                PhotoHelper.REQUEST_CODE_SELECT_FROM_FILE -> PhotoHelper.getInstance(this@TakePhotoActivity).pickFromFile(
+                PhotoHelper.REQUEST_CODE_SELECT_FROM_FILE -> PhotoHelper.pickFromFile(
                     this@TakePhotoActivity
                 )
-                PhotoHelper.REQUEST_CODE_SELECT_FROM_FILE_WITH_CROP -> PhotoHelper.getInstance(this@TakePhotoActivity).pickFromFileWithCrop(
+                PhotoHelper.REQUEST_CODE_SELECT_FROM_FILE_WITH_CROP -> PhotoHelper.pickFromFileWithCrop(
                     this@TakePhotoActivity,
                     width,
                     height
@@ -153,36 +149,15 @@ class TakePhotoActivity : Activity() {
         }
     }
 
-    private fun <U> addRxBusSubscribe(eventType: Class<U>, listener: OnEventListener<U>) {
-        if (compositeDisposable == null) {
-            compositeDisposable = CompositeDisposable()
-        }
-        RxBusHelper.doOnThreadMode(eventType, compositeDisposable, listener)
+    private fun register() {
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(Constants.ACTION_PHOTO_RESULT)
+        intentFilter.addAction(Constants.ACTION_PHOTO_COMPRESS)
+        registerReceiver(broadcastReceiver, intentFilter)
     }
 
-    private fun initData() {
-        addRxBusSubscribe(Uri::class.java, object : OnEventListener<Uri>() {
-            override fun onEvent(uri: Uri) {
-                if (uri != null) {
-                    getPhoto(uri)
-                } else {
-                    finish()
-                }
-            }
-
-            override fun onError(e: Throwable) {
-                finish()
-            }
-        })
-        addRxBusSubscribe(ErrorEvent::class.java, object : OnEventListener<ErrorEvent>() {
-            override fun onEvent(uri: ErrorEvent) {
-                finish()
-            }
-
-            override fun onError(e: Throwable) {
-                finish()
-            }
-        })
+    private fun unRegister() {
+        unregisterReceiver(broadcastReceiver)
     }
 
     private fun showProgressBar() {
@@ -192,9 +167,7 @@ class TakePhotoActivity : Activity() {
             }
             if (progressDialog == null)
                 progressDialog = Dialog(this, R.style.PhotoModuleProgressDialog)
-            progressDialog?.let {
-                it.show()
-            }
+            progressDialog?.show()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -215,48 +188,69 @@ class TakePhotoActivity : Activity() {
 
     private fun getPhoto(uri: Uri) {
         showProgressBar()
-        PhotoHelper.getInstance(this).compress(this, uri, object : Observer<Uri> {
-            override fun onSubscribe(d: Disposable) {
-
-            }
-
-            override fun onNext(value: Uri) {
-                val intent = Intent()
-                intent.data = value
-                setResult(Activity.RESULT_OK, intent)
-            }
-
-            override fun onError(e: Throwable) {
-                showToast(e.message)
-                hideProgressBar()
-                finish()
-            }
-
-            override fun onComplete() {
-                hideProgressBar()
-                finish()
-            }
-
-        })
+        PhotoHelper.compress(this, uri)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        PhotoHelper.getInstance(this).onActivityResult(this, requestCode, resultCode, intent)
+        PhotoHelper.onActivityResult(this, requestCode, resultCode, intent)
         super.onActivityResult(requestCode, resultCode, intent)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        PhotoHelper.getInstance(this).onRequestPermissionsResult(this, requestCode, permissions, grantResults)
+        PhotoHelper.onRequestPermissionsResult(this, requestCode, permissions, grantResults)
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         hideProgressBar()
-        if (compositeDisposable != null) {
-            compositeDisposable!!.dispose()
-            compositeDisposable = null
-        }
+        unRegister()
+    }
 
+    private var broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                Constants.ACTION_PHOTO_RESULT -> {
+                    val uriString = intent.getStringExtra("uri")
+                    if (!TextUtils.isEmpty(uriString)) {
+                        val uri = Uri.parse(uriString)
+                        if (uri != null) {
+                            getPhoto(uri)
+                            return
+                        }
+                    }
+                    val message = intent.getStringExtra("message")
+                    showError(message)
+                    finish()
+
+
+                }
+                Constants.ACTION_PHOTO_COMPRESS -> {
+                    val uriString = intent.getStringExtra("uri")
+                    if (!TextUtils.isEmpty(uriString)) {
+                        val uri = Uri.parse(uriString)
+                        if (uri != null) {
+                            val result = Intent()
+                            result.data = uri
+                            setResult(Activity.RESULT_OK, result)
+                            finish()
+                            return
+                        }
+                    }
+                    val message = intent.getStringExtra("message")
+                    message?.let {
+                        showToast(it)
+                    }
+                    finish()
+                }
+            }
+
+        }
+    }
+
+    private fun showError(message: String?) {
+        message?.let {
+            showToast(it)
+        }
     }
 }

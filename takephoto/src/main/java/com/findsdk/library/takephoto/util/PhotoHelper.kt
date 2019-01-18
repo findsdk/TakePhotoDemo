@@ -6,21 +6,14 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
-import android.util.Log
+import android.support.annotation.RequiresApi
+import android.text.TextUtils
 import android.widget.Toast
 import com.findsdk.library.fileprovider.FileUtils
-import com.findsdk.library.rxbus.RxBusHelper
 import com.findsdk.library.takephoto.R
 import com.findsdk.library.takephoto.TakePhotoConfig
-import io.reactivex.Observable
-import io.reactivex.Observer
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.functions.Function
-import io.reactivex.functions.Predicate
-import io.reactivex.schedulers.Schedulers
 
 import java.io.File
 import java.util.*
@@ -28,32 +21,32 @@ import java.util.*
 /**
  * Created by bvb on 2018/12/27.
  */
-internal class PhotoHelper(var context: Context) {
-
-    companion object {
-        const val REQUEST_CODE_SELECT_FROM_GALLERY = 555
-        const val REQUEST_CODE_SELECT_FROM_GALLERY_WITH_CROP = REQUEST_CODE_SELECT_FROM_GALLERY + 1
-        const val REQUEST_CODE_SELECT_FROM_FILE = REQUEST_CODE_SELECT_FROM_GALLERY_WITH_CROP + 1
-        const val REQUEST_CODE_SELECT_FROM_FILE_WITH_CROP = REQUEST_CODE_SELECT_FROM_FILE + 1
-        const val REQUEST_CODE_TAKE_PHOTO = REQUEST_CODE_SELECT_FROM_FILE_WITH_CROP + 1
-        const val REQUEST_CODE_TAKE_PHOTO_WITH_CROP = REQUEST_CODE_TAKE_PHOTO + 1
-        const val REQUEST_CODE_CROP = REQUEST_CODE_TAKE_PHOTO_WITH_CROP + 1
-        const val REQUEST_CODE_TAKE_CUSTOM_PHOTO = REQUEST_CODE_CROP + 1
-        const val REQUEST_CODE_TAKE_CUSTOM_PHOTO_WITH_CROP = REQUEST_CODE_TAKE_CUSTOM_PHOTO + 1
+internal object PhotoHelper {
 
 
-        private const val REQUEST_PERMISSION_CAMERA = 348
-        private const val REQUEST_PERMISSION_CUSTOM_CAMERA = 349
-        private const val REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE = 350
+    const val REQUEST_CODE_SELECT_FROM_GALLERY = 555
+    const val REQUEST_CODE_SELECT_FROM_GALLERY_WITH_CROP = REQUEST_CODE_SELECT_FROM_GALLERY + 1
+    const val REQUEST_CODE_SELECT_FROM_FILE = REQUEST_CODE_SELECT_FROM_GALLERY_WITH_CROP + 1
+    const val REQUEST_CODE_SELECT_FROM_FILE_WITH_CROP = REQUEST_CODE_SELECT_FROM_FILE + 1
+    const val REQUEST_CODE_TAKE_PHOTO = REQUEST_CODE_SELECT_FROM_FILE_WITH_CROP + 1
+    const val REQUEST_CODE_TAKE_PHOTO_WITH_CROP = REQUEST_CODE_TAKE_PHOTO + 1
+    const val REQUEST_CODE_CROP = REQUEST_CODE_TAKE_PHOTO_WITH_CROP + 1
+    const val REQUEST_CODE_TAKE_CUSTOM_PHOTO = REQUEST_CODE_CROP + 1
+    const val REQUEST_CODE_TAKE_CUSTOM_PHOTO_WITH_CROP = REQUEST_CODE_TAKE_CUSTOM_PHOTO + 1
 
-        private var instance: PhotoHelper? = null
-        fun getInstance(context: Context): PhotoHelper {
-            if (instance == null) {
-                instance = PhotoHelper(context)
-            }
-            return instance!!
-        }
-    }
+
+    private const val REQUEST_PERMISSION_CAMERA = 348
+    private const val REQUEST_PERMISSION_CUSTOM_CAMERA = 349
+    private const val REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE = 350
+
+//        private var instance: PhotoHelper? = null
+//        fun getInstance(context: Context): PhotoHelper {
+//            if (instance == null) {
+//                instance = PhotoHelper(context)
+//            }
+//            return instance!!
+//        }
+
 
     /**
      * 图片文件输出Uri
@@ -100,75 +93,66 @@ internal class PhotoHelper(var context: Context) {
      */
     private var pickRequestCode: Int = 0
 
-    fun compress(context: Context, uri: Uri, observer: Observer<Uri>) {
-        Observable.just(uri)
-            .map { uri -> FileUtils.getFileWithUri(context, uri) }
-            .subscribeOn(Schedulers.io())
-            .map(Function<File, Bitmap> { file ->
-                PhotoUtil.getRotatedBitmap(
-                    file.absolutePath,
-                    Constants.IMAGE_SIZE.UPLOAD_MAX_SIZE,
-                    Constants.IMAGE_SIZE.UPLOAD_MAX_WIDTH,
-                    Constants.IMAGE_SIZE.UPLOAD_MAX_HEIGHT
-                )
-            })
-            .map(Function<Bitmap, File> { bitmap ->
-                PhotoUtil.saveBitmapFile(
-                    StringBuffer()
-                        //.append(FileUtils.getExternalStoragePublicDirectoryForPic(mContext))
-                        .append(FileUtils.getExternalFilesDirForPic(context))
-                        .append(System.currentTimeMillis())
-                        .append(".jpg").toString(),
-                    bitmap
-                )
-            })
-            .filter(object : Predicate<File> {
-                @Throws(Exception::class)
-                override fun test(file: File): Boolean {
-                    return file != null
-                }
-            })
-            .map { file -> FileUtils.getUriForFile(context, file) }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(observer)
-
+    fun compress(context: Context, uri: Uri) {
+        val bitmap = PhotoUtil.getRotatedBitmap(
+            FileUtils.getFileWithUri(context, uri).absolutePath, Constants.IMAGE_SIZE.UPLOAD_MAX_SIZE,
+            Constants.IMAGE_SIZE.UPLOAD_MAX_WIDTH,
+            Constants.IMAGE_SIZE.UPLOAD_MAX_HEIGHT
+        )
+        if (bitmap != null) {
+            val file = PhotoUtil.saveBitmapFile(
+                StringBuffer()
+                    .append(FileUtils.getExternalFilesDirForPic(context))
+                    .append(System.currentTimeMillis())
+                    .append(".jpg").toString(),
+                bitmap
+            )
+            if (file != null) {
+                val uri1 = FileUtils.getUriForFile(context, file)
+                sendCompress(context, uri1, null)
+            } else {
+                sendCompress(context, null, null)
+            }
+        } else {
+            sendCompress(context, null, null)
+        }
     }
 
     /**
      * 获取输出文件对象
      * @return File
      */
-    fun getOutputFile(): File {
-        val file: File
-        if (isCrop) {
-            if (tempUri != null) {
-                file = FileUtils.getFileWithUri(context, tempUri)
-            } else {
-                file = cameraTmpFile!!
-            }
-        } else {
-            if (outputUri != null) {
-                file = FileUtils.getFileWithUri(context, outputUri)
-            } else {
-                file = cameraTmpFile!!
-            }
-        }
-        return file
-    }
+//    fun getOutputFile(context: Context): File {
+//        val file: File
+//        if (isCrop) {
+//            if (tempUri != null) {
+//                file = FileUtils.getFileWithUri(context, tempUri)
+//            } else {
+//                file = cameraTmpFile!!
+//            }
+//        } else {
+//            if (outputUri != null) {
+//                file = FileUtils.getFileWithUri(context, outputUri)
+//            } else {
+//                file = cameraTmpFile!!
+//            }
+//        }
+//        return file
+//    }
 
     /**
      * 获取裁剪文件对象
      * @return File
      */
-    fun getCropedFile(): File {
-        val file: File
-        if (cropUri != null) {
-            file = FileUtils.getFileWithUri(context, cropUri)
-        } else {
-            file = cameraTmpFile!!
-        }
-        return file
-    }
+//    fun getCropedFile(context: Context): File {
+//        val file: File
+//        if (cropUri != null) {
+//            file = FileUtils.getFileWithUri(context, cropUri)
+//        } else {
+//            file = cameraTmpFile!!
+//        }
+//        return file
+//    }
 
     private fun setSize(width: Int, height: Int) {
         imgWidth = width
@@ -180,9 +164,10 @@ internal class PhotoHelper(var context: Context) {
      * takePhoto
      * @param activity Activity
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     fun takePhoto(activity: Activity) {
         isCrop = false
-        if (Build.VERSION.SDK_INT >= 23) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissionCamera(activity)
         } else {
             startCamera(activity)
@@ -195,6 +180,7 @@ internal class PhotoHelper(var context: Context) {
      * @param width Int
      * @param height Int
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     fun takePhotoWithCrop(activity: Activity, width: Int, height: Int) {
         //        this.mActivity = activity;
         if (width < 0 || height < 0) {
@@ -203,7 +189,7 @@ internal class PhotoHelper(var context: Context) {
         }
         isCrop = true
         setSize(width, height)
-        if (Build.VERSION.SDK_INT >= 23) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissionCamera(activity)
         } else {
             startCamera(activity)
@@ -215,6 +201,7 @@ internal class PhotoHelper(var context: Context) {
      * 打开拍照界面
      * @param activity Activity
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun startCamera(activity: Activity) {
         path = PhotoUtil.getTempPath(activity).absolutePath // 图片保存路径
         fileName = Random().nextInt().toString() + "tmp.jpg"
@@ -242,9 +229,10 @@ internal class PhotoHelper(var context: Context) {
      * @param activity Activity
      * @param outputUri Uri
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun captureWithCrop(activity: Activity, outputUri: Uri) {
         this.outputUri = outputUri
-        if (Build.VERSION.SDK_INT >= 23) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             this.tempUri = PhotoUtil.getTempUri(activity)
         } else {
             this.tempUri = outputUri
@@ -269,14 +257,15 @@ internal class PhotoHelper(var context: Context) {
      * @return Boolean
      * @throws Exception
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     @Throws(Exception::class)
     private fun captureBySafely(activity: Activity, intent: Intent): Boolean {
         val result = activity.packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL)
-        if (result.isEmpty()) {
+        return if (result.isEmpty()) {
             showToast(activity, TakePhotoConfig.languageNoCamera)
-            return false
+            false
         } else {
-            return true
+            true
         }
     }
 
@@ -285,8 +274,9 @@ internal class PhotoHelper(var context: Context) {
      * @param activity Activity
      * @param outputUri Uri
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun capture(activity: Activity, outputUri: Uri) {
-        if (Build.VERSION.SDK_INT >= 23) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             this.outputUri = FileUtils.convertFileUriToFileProviderUri(activity, outputUri)
         } else {
             this.outputUri = outputUri
@@ -382,6 +372,7 @@ internal class PhotoHelper(var context: Context) {
      * 使用系统相机时请求拍照权限
      * @param activity Activity
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun requestPermissionCamera(activity: Activity) {
         if (PermissionUtil.requestPermissions(
                 activity,
@@ -499,6 +490,7 @@ internal class PhotoHelper(var context: Context) {
      * @param permissions Array<String>
      * @param grantResults IntArray?
      */
+    @RequiresApi(Build.VERSION_CODES.M)
     fun onRequestPermissionsResult(
         activity: Activity,
         requestCode: Int,
@@ -658,11 +650,11 @@ internal class PhotoHelper(var context: Context) {
 
     }
 
-    fun crop(activity: Activity, targetUri: Uri, outPutUri: Uri) {
+    private fun crop(activity: Activity, targetUri: Uri, outPutUri: Uri) {
         onCrop(activity, targetUri, outPutUri, PhotoUtil.getCropOptions(imgWidth, imgHeight))
     }
 
-    fun onCrop(activity: Activity, targetUri: Uri, outPutUri: Uri, options: CropOptions) {
+    private fun onCrop(activity: Activity, targetUri: Uri, outPutUri: Uri, options: CropOptions) {
         //this.outputUri = outPutUri;
         this.cropUri = outPutUri
         val intent = IntentUtil.getCropIntent(targetUri, outPutUri, options)
@@ -693,17 +685,17 @@ internal class PhotoHelper(var context: Context) {
                 // 拍照
                 Constants.USE_CUSTOM_CAMERA, Constants.USE_CAMERA -> {
                     if (outputUri != null) {
-                        val uri = Uri.fromFile(FileUtils.getFileWithUri(context, outputUri))
-                        postResult(uri)
+                        val uri = Uri.fromFile(FileUtils.getFileWithUri(activity, outputUri))
+                        sendResult(activity, uri, null)
                     } else {
-                        postResult(Uri.fromFile(cameraTmpFile))
+                        sendResult(activity, Uri.fromFile(cameraTmpFile), null)
                     }
                 }
                 //拍照并裁剪
                 //                case Constants.USE_CUSTOM_CAMERA_WITH_CROP:
                 Constants.USE_CAMERA_WITH_CROP -> {
                     if (outputUri != null) {
-                        val uri = Uri.fromFile(File(FileUtils.parseUri(context, outputUri)))
+                        val uri = Uri.fromFile(File(FileUtils.parseUri(activity, outputUri)))
                         crop(activity, tempUri!!, uri)
                         outputUri = null
                     } else {
@@ -714,10 +706,10 @@ internal class PhotoHelper(var context: Context) {
                 }
                 // 裁剪返回结果
                 Constants.TAKE_PHOTO_WITH_CROP -> if (outputUri != null) {
-                    postResult(outputUri!!)
+                    sendResult(activity, outputUri!!, null)
                     outputUri = null
                 } else {
-                    postResult(Uri.fromFile(cameraTmpFile))
+                    sendResult(activity, Uri.fromFile(cameraTmpFile), null)
                     cameraTmpFile = null
                 }
                 //从相册选择照片不裁剪
@@ -729,7 +721,7 @@ internal class PhotoHelper(var context: Context) {
                         return
                     }
                     val uri1 = Uri.fromFile(File(filePath))
-                    postResult(uri1)
+                    sendResult(activity, uri1, null)
                 }
                 //从相册选择照片并裁剪
                 Constants.TAKE_GALLERY_WITH_CROP -> {
@@ -750,7 +742,7 @@ internal class PhotoHelper(var context: Context) {
                         return
                     }
                     val uri1 = Uri.fromFile(File(filePath))
-                    postResult(uri1)
+                    sendResult(activity, uri1, null)
                 }
                 //从文件选择照片，并裁剪
                 Constants.TAKE_FILE_WITH_CROP -> {
@@ -764,16 +756,32 @@ internal class PhotoHelper(var context: Context) {
                 }
             }
         } else if (resultCode == Activity.RESULT_CANCELED) {
-            RxBusHelper.post(ErrorEvent())
+            sendResult(activity, null, null)
         }
-    }
-
-    private fun postResult(uri: Uri) {
-        RxBusHelper.post(uri)
     }
 
     private fun notImageFile(activity: Activity) {
         showToast(activity, TakePhotoConfig.languageNotImage)
-        RxBusHelper.post(ErrorEvent())
+        sendResult(activity, null, null)
     }
+
+
+    private fun sendResult(context: Context, uri: Uri?, errorMessage: String?) {
+        val intent = Intent(Constants.ACTION_PHOTO_RESULT)
+        if (uri != null)
+            intent.putExtra("uri", uri.toString())
+        if (!TextUtils.isEmpty(errorMessage))
+            intent.putExtra(Constants.INTENT_KEY.ERROR_MESSAGE, errorMessage)
+        context.sendBroadcast(intent)
+    }
+
+    private fun sendCompress(context: Context, uri: Uri?, errorMessage: String?) {
+        val intent = Intent(Constants.ACTION_PHOTO_COMPRESS)
+        if (uri != null)
+            intent.putExtra("uri", uri.toString())
+        if (!TextUtils.isEmpty(errorMessage))
+            intent.putExtra(Constants.INTENT_KEY.ERROR_MESSAGE, errorMessage)
+        context.sendBroadcast(intent)
+    }
+
 }

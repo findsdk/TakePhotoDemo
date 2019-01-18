@@ -1,7 +1,10 @@
 package com.findsdk.demo.takephoto
 
 import android.app.Activity
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -48,7 +51,6 @@ class MainActivity : AppCompatActivity() {
         TakePhotoConfig.languageNotImage = "not image"
         TakePhotoConfig.languageRequestPermissionsCameraTips = "相机权限"
         TakePhotoConfig.languageRequestPermissionsExternalStorageTips = "文件权限"
-
     }
 
     private fun takePhoto() {

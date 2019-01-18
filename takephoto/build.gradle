@@ -29,30 +29,38 @@ dependencies {
     testImplementation "junit:junit:$test.junit"
     implementation "com.android.support:appcompat-v7:$support.appcompat_v7"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    //Rxjava
-    implementation "io.reactivex.rxjava2:rxandroid:$lib.rxandroid"
-    implementation "io.reactivex.rxjava2:rxjava:$lib.rxjava"
 
     implementation "com.findsdk.library:fileprovider:1.0.0"
-    implementation "com.findsdk.library:rxbus:1.0.0"
+
 }
 
 //--------------------
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-//项目主页
-def siteUrl = SITE_URL
-//项目的版本控制地址
-def gitUrl = GIT_URL
+Properties properties = new Properties()
+properties.load(project.file('bintray.properties').newDataInputStream())
 
+
+//项目主页
+def siteUrl = properties.getProperty("SITE_URL")
+//项目的版本控制地址
+def gitUrl = properties.getProperty("GIT_URL")
+
+def repoName = properties.getProperty("REPO_NAME")
 //发布到组织名称名字，必须填写
-group = GROUP_ID
+group = properties.getProperty("GROUP_ID")
 //发布到JCenter上的项目名字，必须填写
-def libName = ARTIFACT_ID
+def libName = properties.getProperty("ARTIFACT_ID")
 // 版本号，下次更新是只需要更改版本号即可
-version = LIB_VERSION_NAME
+version = properties.getProperty("LIB_VERSION_NAME")
 /**  上面配置后上传至JCenter后的编译路径是这样的： compile 'group:libName:version'  **/
+def packagType = properties.getProperty("PACKAG_TYPE")
+def description = properties.getProperty("DESCRIPTION")
+
+def DEVELOPER_ID = properties.getProperty("DEVELOPER_ID")
+def DEVELOPER_NAME = properties.getProperty("DEVELOPER_NAME")
+def DEVELOPER_EMAIL = properties.getProperty("DEVELOPER_EMAIL")
 
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
@@ -66,7 +74,7 @@ task javadoc(type: Javadoc) {
     options.charSet 'UTF-8'
     options.author true
     options.version true
-    options.links SITE_URL
+    options.links siteUrl
     failOnError false
 }
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -78,14 +86,13 @@ artifacts {
     archives sourcesJar
 }
 
-
 // 根节点添加
 install {
     repositories.mavenInstaller {
         // This generates POM.xml with proper parameters
         pom {
             project {
-                packaging PACKAG_TYPE
+                packaging packagType
                 name libName
                 url siteUrl
                 // Set your license
@@ -113,16 +120,14 @@ install {
 }
 
 //上传到JCenter
-Properties properties = new Properties()
-properties.load(project.rootProject.file('gradle.properties').newDataInputStream())
 bintray {
-    user = properties.getProperty("bintray.user")    //读取 local.properties 文件里面的 bintray.user
-    key = properties.getProperty("bintray.apikey")   //读取 local.properties 文件里面的 bintray.apikey
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
     configurations = ['archives']
     pkg {
-        repo = REPO_NAME
+        repo = repoName
         name = libName    //发布到JCenter上的项目名字，必须填写
-        desc = DESCRIPTION    //项目描述
+        desc = description    //项目描述
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]
