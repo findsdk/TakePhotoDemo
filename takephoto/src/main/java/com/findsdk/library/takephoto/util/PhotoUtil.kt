@@ -16,6 +16,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.text.TextUtils
 import com.findsdk.library.fileprovider.FileUtils
+import com.findsdk.library.fileprovider.UriUtil
 import com.findsdk.library.takephoto.TakePhotoConfig
 import java.io.*
 import java.text.SimpleDateFormat
@@ -30,9 +31,9 @@ internal object PhotoUtil {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val file =
             File(Environment.getExternalStorageDirectory(), "/${TakePhotoConfig.photoDirectoryName}/$timeStamp.jpg")
-        if (file != null && file.parentFile != null && !file.parentFile.exists())
+        if (file.parentFile != null && !file.parentFile.exists())
             file.parentFile.mkdirs()
-        return FileUtils.getUriForFile(context, file)
+        return UriUtil.getUriForFile(context, file)
     }
 
     fun getTempPath(context: Context): File {
@@ -167,8 +168,8 @@ internal object PhotoUtil {
      * @param filePath String
      * @return Bitmap?
      */
-    fun path2Bitmap(context: Context, filePath: String): Bitmap? {
-        var uri = FileUtils.getUriForFile(context, File(filePath))
+    fun path2Bitmap(context: Context, filePath: String?): Bitmap? {
+        var uri = UriUtil.getUriForFile(context, File(filePath))
         if (uri != null) {
             return MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
         } else {

@@ -8,10 +8,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import android.text.TextUtils
 import android.widget.Toast
 import com.findsdk.library.fileprovider.FileUtils
+import com.findsdk.library.fileprovider.UriUtil
 import com.findsdk.library.takephoto.R
 import com.findsdk.library.takephoto.TakePhotoConfig
 
@@ -95,7 +96,7 @@ internal object PhotoHelper {
 
     fun compress(context: Context, uri: Uri) {
         val bitmap = PhotoUtil.getRotatedBitmap(
-            FileUtils.getFileWithUri(context, uri).absolutePath, Constants.IMAGE_SIZE.UPLOAD_MAX_SIZE,
+            FileUtils.getFileWithUri(context, uri)!!.absolutePath, Constants.IMAGE_SIZE.UPLOAD_MAX_SIZE,
             Constants.IMAGE_SIZE.UPLOAD_MAX_WIDTH,
             Constants.IMAGE_SIZE.UPLOAD_MAX_HEIGHT
         )
@@ -108,7 +109,7 @@ internal object PhotoHelper {
                 bitmap
             )
             if (file != null) {
-                val uri1 = FileUtils.getUriForFile(context, file)
+                val uri1 = UriUtil.getUriForFile(context, file)
                 sendCompress(context, uri1, null)
             } else {
                 sendCompress(context, null, null)
@@ -277,7 +278,7 @@ internal object PhotoHelper {
     @RequiresApi(Build.VERSION_CODES.M)
     private fun capture(activity: Activity, outputUri: Uri) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            this.outputUri = FileUtils.convertFileUriToFileProviderUri(activity, outputUri)
+            this.outputUri = UriUtil.convertFileUriToFileProviderUri(activity, outputUri)
         } else {
             this.outputUri = outputUri
         }
@@ -576,7 +577,7 @@ internal object PhotoHelper {
      */
     private fun captureByCustom(activity: Activity, outputUri: Uri, useBackCamera: Boolean) {
         if (Build.VERSION.SDK_INT >= 23) {
-            this.outputUri = FileUtils.convertFileUriToFileProviderUri(activity, outputUri)
+            this.outputUri = UriUtil.convertFileUriToFileProviderUri(activity, outputUri)
         } else {
             this.outputUri = outputUri
         }
@@ -605,7 +606,7 @@ internal object PhotoHelper {
     private fun captureByCustom(activity: Activity, outputFile: File, useBackCamera: Boolean) {
         val uri = Uri.fromFile(outputFile)
         if (Build.VERSION.SDK_INT >= 23) {
-            this.outputUri = FileUtils.convertFileUriToFileProviderUri(activity, uri)
+            this.outputUri = UriUtil.convertFileUriToFileProviderUri(activity, uri)
         } else {
             this.outputUri = uri
         }
@@ -685,7 +686,7 @@ internal object PhotoHelper {
                 // 拍照
                 Constants.USE_CUSTOM_CAMERA, Constants.USE_CAMERA -> {
                     if (outputUri != null) {
-                        val uri = Uri.fromFile(FileUtils.getFileWithUri(activity, outputUri))
+                        val uri = Uri.fromFile(FileUtils.getFileWithUri(activity, outputUri!!))
                         sendResult(activity, uri, null)
                     } else {
                         sendResult(activity, Uri.fromFile(cameraTmpFile), null)
@@ -695,7 +696,7 @@ internal object PhotoHelper {
                 //                case Constants.USE_CUSTOM_CAMERA_WITH_CROP:
                 Constants.USE_CAMERA_WITH_CROP -> {
                     if (outputUri != null) {
-                        val uri = Uri.fromFile(File(FileUtils.parseUri(activity, outputUri)))
+                        val uri = Uri.fromFile(File(UriUtil.parseUri(activity, outputUri!!)))
                         crop(activity, tempUri!!, uri)
                         outputUri = null
                     } else {
