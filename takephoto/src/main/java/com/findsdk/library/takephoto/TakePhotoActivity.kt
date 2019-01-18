@@ -7,7 +7,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.support.annotation.RequiresApi
 import android.text.TextUtils
 import android.widget.Toast
 import com.findsdk.library.takephoto.util.Constants
@@ -106,6 +108,7 @@ class TakePhotoActivity : Activity() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         register()
@@ -113,6 +116,7 @@ class TakePhotoActivity : Activity() {
         initView()
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun initView() {
         if (intent != null) {
             val key = intent.getIntExtra(KEY_TYPE, -1)
@@ -196,6 +200,7 @@ class TakePhotoActivity : Activity() {
         super.onActivityResult(requestCode, resultCode, intent)
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         PhotoHelper.onRequestPermissionsResult(this, requestCode, permissions, grantResults)
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)

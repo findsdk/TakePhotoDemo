@@ -28,7 +28,7 @@ object TakePhotoUtil {
      * @param uri Uri
      * @return String?
      */
-    private fun uri2FilePath(context: Context, uri: Uri): String? {
+    fun uri2FilePath(context: Context, uri: Uri): String? {
         return FileUtils.getFilePathWithUri(context, uri)
     }
 
