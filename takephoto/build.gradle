@@ -2,11 +2,11 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 android {
-    compileSdkVersion sdk.compileSdkVersion
+    compileSdkVersion 28
 
     defaultConfig {
-        minSdkVersion sdk.minSdkVersion
-        targetSdkVersion sdk.targetSdkVersion
+        minSdkVersion 14
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
@@ -26,11 +26,11 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-    testImplementation "junit:junit:$test.junit"
+    testImplementation 'junit:junit:4.12'
     implementation 'androidx.appcompat:appcompat:1.1.0-alpha01'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
-    implementation "com.findsdk.library.androidx:fileprovider:0.0.1"
+    implementation 'com.findsdk.library.androidx:fileprovider:0.0.1'
 
 }
 
