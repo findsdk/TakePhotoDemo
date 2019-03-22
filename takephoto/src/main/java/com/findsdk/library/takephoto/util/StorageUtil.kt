@@ -25,15 +25,20 @@ internal object StorageUtil {
         val dir = (Environment
             .getExternalStorageDirectory().toString()
                 + "/${TakePhotoConfig.photoDirectoryName}/")
-
-        val f = File(dir)
-        if (f != null && f.exists()) {
-            if (f.isDirectory) {
-                val children = f.list()
-                for (i in children.indices) {
-                    File(f, children[i]).delete()
+        try {
+            val f = File(dir)
+            if (f.exists()) {
+                if (f.isDirectory) {
+                    val children = f.list()
+                    children?.apply {
+                        for (i in this.indices) {
+                            File(f, this[i]).delete()
+                        }
+                    }
                 }
             }
+        }catch (e:Exception){
+
         }
     }
 }
