@@ -30,9 +30,9 @@ internal object StorageUtil {
             if (f.exists()) {
                 if (f.isDirectory) {
                     val children = f.list()
-                    children?.apply {
-                        for (i in this.indices) {
-                            File(f, this[i]).delete()
+                    children?.let {
+                        for (i in it.indices) {
+                            File(f, it[i]).delete()
                         }
                     }
                 }
