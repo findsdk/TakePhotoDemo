@@ -81,13 +81,4 @@ internal object Constants {
         }
     }
 
-    /**
-     * 隐式启动自定义相机的action
-     */
-    interface ACTION {
-        companion object {
-            const val ACTION_CAMERA = "com.findsdk.library.camera"
-        }
-    }
-
 }

@@ -105,6 +105,12 @@ class TakePhotoActivity : Activity() {
             intent.putExtra(KEY_HEIGHT, height)
             context.startActivityForResult(intent, requestCode)
         }
+
+        fun takePhotoUseCustomCamera(context: Activity, requestCode: Int) {
+            val intent = Intent(context, TakePhotoActivity::class.java)
+            intent.putExtra(KEY_TYPE, PhotoHelper.REQUEST_CODE_TAKE_CUSTOM_PHOTO)
+            context.startActivityForResult(intent, requestCode)
+        }
     }
 
 
@@ -145,6 +151,13 @@ class TakePhotoActivity : Activity() {
                     width,
                     height
                 )
+                PhotoHelper.REQUEST_CODE_TAKE_CUSTOM_PHOTO -> {
+
+                    PhotoHelper.takeCustomPhoto(
+                        this@TakePhotoActivity,
+                        intent.getIntExtra(Constants.INTENT_KEY.CAMERA_FACING_TYPE, 0) == 0
+                    )
+                }
                 else -> finish()
 
             }

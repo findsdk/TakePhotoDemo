@@ -94,6 +94,8 @@ internal object PhotoHelper {
      */
     private var pickRequestCode: Int = 0
 
+    private var useBackCamera: Boolean = false
+
     fun compress(context: Context, uri: Uri) {
         val bitmap = PhotoUtil.getRotatedBitmap(
             FileUtils.getFileWithUri(context, uri)!!.absolutePath, Constants.IMAGE_SIZE.UPLOAD_MAX_SIZE,
@@ -169,7 +171,7 @@ internal object PhotoHelper {
     fun takePhoto(activity: Activity) {
         isCrop = false
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissionCamera(activity)
+            requestPermissionCamera(activity, REQUEST_PERMISSION_CAMERA)
         } else {
             startCamera(activity)
         }
@@ -191,12 +193,23 @@ internal object PhotoHelper {
         isCrop = true
         setSize(width, height)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissionCamera(activity)
+            requestPermissionCamera(activity, REQUEST_PERMISSION_CAMERA)
         } else {
             startCamera(activity)
         }
     }
 
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun takeCustomPhoto(activity: Activity, useBackCamera: Boolean) {
+        isCrop = false
+        this.useBackCamera = useBackCamera
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissionCamera(activity, REQUEST_CODE_TAKE_CUSTOM_PHOTO)
+        } else {
+            startCustomCamera(activity)
+        }
+    }
 
     /**
      * 打开拍照界面
@@ -374,16 +387,24 @@ internal object PhotoHelper {
      * @param activity Activity
      */
     @RequiresApi(Build.VERSION_CODES.M)
-    private fun requestPermissionCamera(activity: Activity) {
+    private fun requestPermissionCamera(activity: Activity, requestCode: Int) {
         if (PermissionUtil.requestPermissions(
                 activity,
                 arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA),
-                REQUEST_PERMISSION_CAMERA
+                requestCode
             )
         ) {
-            startCamera(activity)
+            when (requestCode) {
+                REQUEST_PERMISSION_CAMERA -> {
+                    startCamera(activity)
+                }
+                REQUEST_PERMISSION_CUSTOM_CAMERA -> {
+                    startCustomCamera(activity)
+                }
+            }
         }
     }
+
 
     /**
      * 请求访问内部存储权限
@@ -475,9 +496,9 @@ internal object PhotoHelper {
         var intent: Intent? = null
         when (requestCode) {
             Constants.TAKE_FILE, Constants.TAKE_FILE_WITH_CROP -> intent =
-                    IntentUtil.getPickIntentWithDocuments()
+                IntentUtil.getPickIntentWithDocuments()
             Constants.TAKE_GALLERY, Constants.TAKE_GALLERY_WITH_CROP -> intent =
-                    IntentUtil.getPickIntentWithGallery()
+                IntentUtil.getPickIntentWithGallery()
         }
         if (intent != null)
             activity.startActivityForResult(intent, requestCode)
@@ -521,7 +542,7 @@ internal object PhotoHelper {
                         }
                     }
                     if (ret)
-                        startCustomCamera(activity, false)
+                        startCustomCamera(activity)
                     else {
                         showPermissionDialog(activity, TakePhotoConfig.languageRequestPermissionsCameraTips)
                     }
@@ -547,7 +568,7 @@ internal object PhotoHelper {
 
     }
 
-    private fun startCustomCamera(activity: Activity, useBackCamera: Boolean) {
+    private fun startCustomCamera(activity: Activity) {
         path = PhotoUtil.getTempPath(activity).absolutePath // 图片保存路径
         fileName = Random().nextInt().toString() + "tmp.jpg"
         cameraTmpFile = File(path, fileName)
@@ -583,7 +604,7 @@ internal object PhotoHelper {
         }
         try {
             activity.startActivityForResult(
-                Intent(Constants.ACTION.ACTION_CAMERA)
+                Intent(TakePhotoConfig.ACTION_CUSTOM_CAMERA)
                     .putExtra(
                         Constants.INTENT_KEY.CAMERA_FACING_TYPE,
                         if (useBackCamera) Constants.CAMERA_FACING_TYPE.CAMERA_BACK else Constants.CAMERA_FACING_TYPE.CAMERA_FRONT
@@ -637,7 +658,7 @@ internal object PhotoHelper {
         }
         try {
             activity.startActivityForResult(
-                Intent(Constants.ACTION.ACTION_CAMERA)
+                Intent(TakePhotoConfig.ACTION_CUSTOM_CAMERA)
                     .putExtra(
                         Constants.INTENT_KEY.CAMERA_FACING_TYPE,
                         if (useBackCamera) Constants.CAMERA_FACING_TYPE.CAMERA_BACK else Constants.CAMERA_FACING_TYPE.CAMERA_FRONT
