@@ -78,7 +78,12 @@ internal object IntentUtil {
      */
     fun getPickIntentWithGallery(): Intent {
         val intent = Intent()
-        intent.action = Intent.ACTION_PICK//Pick an item from the data
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            intent.action = Intent.ACTION_OPEN_DOCUMENT
+        } else {
+            intent.action = Intent.ACTION_GET_CONTENT
+        }
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "image/*"//从所有图片中进行选择
         return intent
     }

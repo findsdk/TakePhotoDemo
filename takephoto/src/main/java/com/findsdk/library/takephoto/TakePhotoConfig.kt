@@ -27,6 +27,8 @@ object TakePhotoConfig {
 
     var dialog: Dialog? = null
 
+    var ACTION_CUSTOM_CAMERA = ""
+
     fun clearCache(context: Context) {
         if (photoDirectoryName.isNotEmpty()) {
             StorageUtil.deleteCache(context)

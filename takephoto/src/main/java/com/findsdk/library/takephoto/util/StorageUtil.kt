@@ -3,6 +3,7 @@ package com.findsdk.library.takephoto.util
 import android.content.Context
 import android.os.Environment
 import android.util.Log
+import com.findsdk.library.fileprovider.FileUtil
 import com.findsdk.library.takephoto.TakePhotoConfig
 import java.io.File
 import java.nio.file.Files.isDirectory
@@ -22,11 +23,10 @@ internal object StorageUtil {
     }
 
     fun deleteCache(context: Context) {
-        val dir = (Environment
-            .getExternalStorageDirectory().toString()
-                + "/${TakePhotoConfig.photoDirectoryName}/")
+        val dir = TakePhotoConfig.photoDirectoryName
+        val file = FileUtil.getImageDir(context)
         try {
-            val f = File(dir)
+            val f = File(file, dir)
             if (f.exists()) {
                 if (f.isDirectory) {
                     val children = f.list()
@@ -37,6 +37,8 @@ internal object StorageUtil {
                     }
                 }
             }
-        }catch (e:Exception){}
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }

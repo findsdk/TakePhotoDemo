@@ -11,7 +11,8 @@ import android.os.Build
 import android.support.annotation.RequiresApi
 import android.text.TextUtils
 import android.widget.Toast
-import com.findsdk.library.fileprovider.FileUtils
+import com.findsdk.library.fileprovider.FileUtil
+import com.findsdk.library.fileprovider.UriUtil
 import com.findsdk.library.takephoto.R
 import com.findsdk.library.takephoto.TakePhotoConfig
 
@@ -93,22 +94,24 @@ internal object PhotoHelper {
      */
     private var pickRequestCode: Int = 0
 
+    private var cameraType: Int = 0
+
     fun compress(context: Context, uri: Uri) {
         val bitmap = PhotoUtil.getRotatedBitmap(
-            FileUtils.getFileWithUri(context, uri).absolutePath, Constants.IMAGE_SIZE.UPLOAD_MAX_SIZE,
+            FileUtil.getFileWithUri(context, uri)!!.absolutePath, Constants.IMAGE_SIZE.UPLOAD_MAX_SIZE,
             Constants.IMAGE_SIZE.UPLOAD_MAX_WIDTH,
             Constants.IMAGE_SIZE.UPLOAD_MAX_HEIGHT
         )
         if (bitmap != null) {
             val file = PhotoUtil.saveBitmapFile(
                 StringBuffer()
-                    .append(FileUtils.getExternalFilesDirForPic(context))
+                    .append(FileUtil.getExternalFilesDirForPic(context))
                     .append(System.currentTimeMillis())
                     .append(".jpg").toString(),
                 bitmap
             )
             if (file != null) {
-                val uri1 = FileUtils.getUriForFile(context, file)
+                val uri1 = UriUtil.getUriForFile(context, file)
                 sendCompress(context, uri1, null)
             } else {
                 sendCompress(context, null, null)
@@ -168,7 +171,7 @@ internal object PhotoHelper {
     fun takePhoto(activity: Activity) {
         isCrop = false
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissionCamera(activity)
+            requestPermissionCamera(activity, REQUEST_PERMISSION_CAMERA)
         } else {
             startCamera(activity)
         }
@@ -190,12 +193,23 @@ internal object PhotoHelper {
         isCrop = true
         setSize(width, height)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissionCamera(activity)
+            requestPermissionCamera(activity, REQUEST_PERMISSION_CAMERA)
         } else {
             startCamera(activity)
         }
     }
 
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun takeCustomPhoto(activity: Activity, cameraType: Int) {
+        isCrop = false
+        this.cameraType = cameraType
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissionCamera(activity, REQUEST_PERMISSION_CUSTOM_CAMERA)
+        } else {
+            startCustomCamera(activity)
+        }
+    }
 
     /**
      * 打开拍照界面
@@ -203,7 +217,7 @@ internal object PhotoHelper {
      */
     @RequiresApi(Build.VERSION_CODES.M)
     private fun startCamera(activity: Activity) {
-        path = PhotoUtil.getTempPath(activity).absolutePath // 图片保存路径
+        path = PhotoUtil.getTempFile(activity).absolutePath // 图片保存路径
         fileName = Random().nextInt().toString() + "tmp.jpg"
         cameraTmpFile = File(path, fileName)
         if (!StorageUtil.isSDCardEnable()) {
@@ -277,7 +291,7 @@ internal object PhotoHelper {
     @RequiresApi(Build.VERSION_CODES.M)
     private fun capture(activity: Activity, outputUri: Uri) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            this.outputUri = FileUtils.convertFileUriToFileProviderUri(activity, outputUri)
+            this.outputUri = UriUtil.convertFileUriToFileProviderUri(activity, outputUri)
         } else {
             this.outputUri = outputUri
         }
@@ -373,30 +387,38 @@ internal object PhotoHelper {
      * @param activity Activity
      */
     @RequiresApi(Build.VERSION_CODES.M)
-    private fun requestPermissionCamera(activity: Activity) {
+    private fun requestPermissionCamera(activity: Activity, requestCode: Int) {
         if (PermissionUtil.requestPermissions(
                 activity,
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA),
-                REQUEST_PERMISSION_CAMERA
+                arrayOf(Manifest.permission.CAMERA),
+                requestCode
             )
         ) {
-            startCamera(activity)
+            when (requestCode) {
+                REQUEST_PERMISSION_CAMERA -> {
+                    startCamera(activity)
+                }
+                REQUEST_PERMISSION_CUSTOM_CAMERA -> {
+                    startCustomCamera(activity)
+                }
+            }
         }
     }
+
 
     /**
      * 请求访问内部存储权限
      * @param activity Activity
      */
     private fun requestPermissionExternalStorage(activity: Activity) {
-        if (PermissionUtil.requestPermissions(
-                activity,
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE
-            )
-        ) {
-            startPick(activity)
-        }
+//        if (PermissionUtil.requestPermissions(
+//                activity,
+//                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+//                REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE
+//            )
+//        ) {
+        startPick(activity)
+//        }
     }
 
     /**
@@ -424,7 +446,7 @@ internal object PhotoHelper {
      */
     private fun startPick(activity: Activity) {
         if (isCrop) {
-            path = PhotoUtil.getTempPath(activity).absolutePath // 图片保存路径
+            path = PhotoUtil.getTempFile(activity).absolutePath // 图片保存路径
             fileName = Random().nextInt().toString() + "tmp.jpg"
             cameraTmpFile = File(path, fileName)
             //            File file = new File(Environment.getExternalStorageDirectory(), "/.tmp/" + "tmp.jpg");
@@ -474,9 +496,9 @@ internal object PhotoHelper {
         var intent: Intent? = null
         when (requestCode) {
             Constants.TAKE_FILE, Constants.TAKE_FILE_WITH_CROP -> intent =
-                    IntentUtil.getPickIntentWithDocuments()
+                IntentUtil.getPickIntentWithDocuments()
             Constants.TAKE_GALLERY, Constants.TAKE_GALLERY_WITH_CROP -> intent =
-                    IntentUtil.getPickIntentWithGallery()
+                IntentUtil.getPickIntentWithGallery()
         }
         if (intent != null)
             activity.startActivityForResult(intent, requestCode)
@@ -520,7 +542,7 @@ internal object PhotoHelper {
                         }
                     }
                     if (ret)
-                        startCustomCamera(activity, false)
+                        startCustomCamera(activity)
                     else {
                         showPermissionDialog(activity, TakePhotoConfig.languageRequestPermissionsCameraTips)
                     }
@@ -546,8 +568,8 @@ internal object PhotoHelper {
 
     }
 
-    private fun startCustomCamera(activity: Activity, useBackCamera: Boolean) {
-        path = PhotoUtil.getTempPath(activity).absolutePath // 图片保存路径
+    private fun startCustomCamera(activity: Activity) {
+        path = PhotoUtil.getTempFile(activity).absolutePath // 图片保存路径
         fileName = Random().nextInt().toString() + "tmp.jpg"
         cameraTmpFile = File(path, fileName)
         if (!StorageUtil.isSDCardEnable()) {
@@ -563,30 +585,27 @@ internal object PhotoHelper {
         }
         val imageUri = Uri.fromFile(cameraTmpFile)
         if (isCrop)
-            captureWithCropByCustom(activity, imageUri, useBackCamera)
+            captureWithCropByCustom(activity, imageUri, cameraType)
         else
-            captureByCustom(activity, imageUri, useBackCamera)
+            captureByCustom(activity, imageUri, cameraType)
     }
 
     /**
      * 使用自定义相机拍照
      * @param activity Activity
      * @param outputUri Uri
-     * @param useBackCamera Boolean
+     * @param cameraType Int
      */
-    private fun captureByCustom(activity: Activity, outputUri: Uri, useBackCamera: Boolean) {
+    private fun captureByCustom(activity: Activity, outputUri: Uri, cameraType: Int) {
         if (Build.VERSION.SDK_INT >= 23) {
-            this.outputUri = FileUtils.convertFileUriToFileProviderUri(activity, outputUri)
+            this.outputUri = UriUtil.convertFileUriToFileProviderUri(activity, outputUri)
         } else {
             this.outputUri = outputUri
         }
         try {
             activity.startActivityForResult(
-                Intent(Constants.ACTION.ACTION_CAMERA)
-                    .putExtra(
-                        Constants.INTENT_KEY.CAMERA_FACING_TYPE,
-                        if (useBackCamera) Constants.CAMERA_FACING_TYPE.CAMERA_BACK else Constants.CAMERA_FACING_TYPE.CAMERA_FRONT
-                    )
+                Intent(TakePhotoConfig.ACTION_CUSTOM_CAMERA)
+                    .putExtra(Constants.INTENT_KEY.CAMERA_FACING_TYPE, cameraType)
                     .putExtra(Constants.INTENT_KEY.EXTRA_OUTPUT, this.outputUri),
                 Constants.USE_CUSTOM_CAMERA
             )
@@ -596,29 +615,6 @@ internal object PhotoHelper {
 
     }
 
-    /**
-     * 使用自定义相机拍照
-     * @param activity Activity
-     * @param outputFile File
-     * @param useBackCamera Boolean
-     */
-    private fun captureByCustom(activity: Activity, outputFile: File, useBackCamera: Boolean) {
-        val uri = Uri.fromFile(outputFile)
-        if (Build.VERSION.SDK_INT >= 23) {
-            this.outputUri = FileUtils.convertFileUriToFileProviderUri(activity, uri)
-        } else {
-            this.outputUri = uri
-        }
-        try {
-            activity.startActivityForResult(
-                Intent("com.common.photomodule.camera").putExtra("outputFile", outputFile.absolutePath),
-                Constants.USE_CUSTOM_CAMERA
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-    }
 
     /**
      * 使用自定义相机拍照并裁剪
@@ -627,7 +623,7 @@ internal object PhotoHelper {
      * @param outputUri
      * @param useBackCamera
      */
-    private fun captureWithCropByCustom(activity: Activity, outputUri: Uri, useBackCamera: Boolean) {
+    private fun captureWithCropByCustom(activity: Activity, outputUri: Uri, cameraType: Int) {
         this.outputUri = outputUri
         if (Build.VERSION.SDK_INT >= 23) {
             this.tempUri = PhotoUtil.getTempUri(activity)
@@ -636,10 +632,9 @@ internal object PhotoHelper {
         }
         try {
             activity.startActivityForResult(
-                Intent(Constants.ACTION.ACTION_CAMERA)
+                Intent(TakePhotoConfig.ACTION_CUSTOM_CAMERA)
                     .putExtra(
-                        Constants.INTENT_KEY.CAMERA_FACING_TYPE,
-                        if (useBackCamera) Constants.CAMERA_FACING_TYPE.CAMERA_BACK else Constants.CAMERA_FACING_TYPE.CAMERA_FRONT
+                        Constants.INTENT_KEY.CAMERA_FACING_TYPE, cameraType
                     )
                     .putExtra(Constants.INTENT_KEY.EXTRA_OUTPUT, this.tempUri),
                 Constants.USE_CUSTOM_CAMERA_WITH_CROP
@@ -679,13 +674,14 @@ internal object PhotoHelper {
         activity.startActivityForResult(intent, REQUEST_CODE_CROP)
     }
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 // 拍照
                 Constants.USE_CUSTOM_CAMERA, Constants.USE_CAMERA -> {
                     if (outputUri != null) {
-                        val uri = Uri.fromFile(FileUtils.getFileWithUri(activity, outputUri))
+                        val uri = Uri.fromFile(FileUtil.getFileWithUri(activity, outputUri!!))
                         sendResult(activity, uri, null)
                     } else {
                         sendResult(activity, Uri.fromFile(cameraTmpFile), null)
@@ -695,7 +691,7 @@ internal object PhotoHelper {
                 //                case Constants.USE_CUSTOM_CAMERA_WITH_CROP:
                 Constants.USE_CAMERA_WITH_CROP -> {
                     if (outputUri != null) {
-                        val uri = Uri.fromFile(File(FileUtils.parseUri(activity, outputUri)))
+                        val uri = Uri.fromFile(File(UriUtil.parseUri(activity, outputUri!!)))
                         crop(activity, tempUri!!, uri)
                         outputUri = null
                     } else {
@@ -714,19 +710,20 @@ internal object PhotoHelper {
                 }
                 //从相册选择照片不裁剪
                 Constants.TAKE_GALLERY -> {
-                    val uri = data!!.data
-                    val filePath = FileUtils.getFilePathWithUri(activity, uri)
+                    val galleryUri = data!!.data
+                    val uri = PhotoUtil.convertGalleryUriToFileProviderUri(activity, galleryUri)
+                    val filePath = FileUtil.getFilePathWithUri(activity, uri)
                     if (!PhotoUtil.isImageFile(activity, filePath)) {
                         notImageFile(activity)
                         return
                     }
-                    val uri1 = Uri.fromFile(File(filePath))
-                    sendResult(activity, uri1, null)
+                    sendResult(activity, uri, null)
                 }
                 //从相册选择照片并裁剪
                 Constants.TAKE_GALLERY_WITH_CROP -> {
-                    val uri = data!!.data
-                    val filePath = FileUtils.getFilePathWithUri(activity, uri)
+                    val galleryUri = data!!.data
+                    val uri = PhotoUtil.convertGalleryUriToFileProviderUri(activity, galleryUri)
+                    val filePath = FileUtil.getFilePathWithUri(activity, uri)
                     if (!PhotoUtil.isImageFile(activity, filePath)) {
                         notImageFile(activity)
                         return
@@ -736,7 +733,7 @@ internal object PhotoHelper {
                 //从文件选择照片不裁剪
                 Constants.TAKE_FILE -> {
                     val uri = data!!.data
-                    val filePath = FileUtils.getFilePathWithDocumentsUri(activity, uri)
+                    val filePath = FileUtil.getFilePathWithDocumentsUri(activity, uri)
                     if (!PhotoUtil.isImageFile(activity, filePath)) {
                         notImageFile(activity)
                         return
@@ -747,7 +744,7 @@ internal object PhotoHelper {
                 //从文件选择照片，并裁剪
                 Constants.TAKE_FILE_WITH_CROP -> {
                     val uri = data!!.data
-                    val filePath = FileUtils.getFilePathWithDocumentsUri(activity, uri)
+                    val filePath = FileUtil.getFilePathWithDocumentsUri(activity, uri)
                     if (!PhotoUtil.isImageFile(activity, filePath)) {
                         notImageFile(activity)
                         return

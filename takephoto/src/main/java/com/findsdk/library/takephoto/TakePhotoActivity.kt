@@ -105,6 +105,13 @@ class TakePhotoActivity : Activity() {
             intent.putExtra(KEY_HEIGHT, height)
             context.startActivityForResult(intent, requestCode)
         }
+
+        fun takePhotoUseCustomCamera(context: Activity, requestCode: Int, cameraType: Int) {
+            val intent = Intent(context, TakePhotoActivity::class.java)
+            intent.putExtra(KEY_TYPE, PhotoHelper.REQUEST_CODE_TAKE_CUSTOM_PHOTO)
+            intent.putExtra(Constants.INTENT_KEY.CAMERA_FACING_TYPE, cameraType)
+            context.startActivityForResult(intent, requestCode)
+        }
     }
 
 
@@ -145,6 +152,16 @@ class TakePhotoActivity : Activity() {
                     width,
                     height
                 )
+                PhotoHelper.REQUEST_CODE_TAKE_CUSTOM_PHOTO -> {
+
+                    PhotoHelper.takeCustomPhoto(
+                        this@TakePhotoActivity,
+                        intent.getIntExtra(
+                            Constants.INTENT_KEY.CAMERA_FACING_TYPE,
+                            Constants.CAMERA_FACING_TYPE.CAMERA_BACK
+                        )
+                    )
+                }
                 else -> finish()
 
             }
@@ -195,6 +212,7 @@ class TakePhotoActivity : Activity() {
         PhotoHelper.compress(this, uri)
     }
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         PhotoHelper.onActivityResult(this, requestCode, resultCode, intent)
         super.onActivityResult(requestCode, resultCode, intent)

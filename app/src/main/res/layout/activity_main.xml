@@ -10,7 +10,7 @@
     <ScrollView
             android:layout_width="match_parent"
             android:fillViewport="true"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content" tools:ignore="MissingConstraints">
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -70,6 +70,19 @@
                         android:layout_margin="10dp"
                         android:text="pick_from_gallery_crop"
                 />
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                          android:orientation="horizontal"
+            >
+
+                <Button
+                        android:id="@+id/delete_tmp_dir"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:text="del tmp dir"
+                />
+
             </LinearLayout>
             <TextView
                     android:id="@+id/text1"

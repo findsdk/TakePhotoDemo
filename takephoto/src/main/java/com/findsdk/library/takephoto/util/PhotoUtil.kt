@@ -4,22 +4,18 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.hardware.Camera
-import android.hardware.camera2.CameraCaptureSession
 import android.hardware.camera2.CameraCharacteristics
-import android.hardware.camera2.CameraDevice
-import android.hardware.camera2.CameraManager
-import android.media.CameraProfile
 import android.media.ExifInterface
 import android.net.Uri
-import android.os.Environment
 import android.provider.MediaStore
 import android.text.TextUtils
-import com.findsdk.library.fileprovider.FileUtils
+import com.findsdk.library.fileprovider.FileUtil
+import com.findsdk.library.fileprovider.UriUtil
 import com.findsdk.library.takephoto.TakePhotoConfig
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 /**
  * Created by bvb on 2016/10/26.
@@ -29,22 +25,23 @@ internal object PhotoUtil {
     fun getTempUri(context: Context): Uri {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val file =
-            File(Environment.getExternalStorageDirectory(), "/${TakePhotoConfig.photoDirectoryName}/$timeStamp.jpg")
-        if (file != null && file.parentFile != null && !file.parentFile.exists())
+            File(getTempFile(context), "/${TakePhotoConfig.photoDirectoryName}/$timeStamp.jpg")
+        if (file?.parentFile != null && !file.parentFile.exists())
             file.parentFile.mkdirs()
-        return FileUtils.getUriForFile(context, file)
+        return UriUtil.getUriForFile(context, file)
     }
 
-    fun getTempPath(context: Context): File {
-        val dir = (Environment
-            .getExternalStorageDirectory().toString()
-                + "/${TakePhotoConfig.photoDirectoryName}/")
-
-        val f = File(dir)
+    fun getTempFile(context: Context): File {
+//        val dir = (Environment
+//            .getExternalStorageDirectory().toString()
+//                + "/${TakePhotoConfig.photoDirectoryName}/")
+//
+//        val f = File(dir)
+        val f = FileUtil.getImageDir(context)
         if (f != null && !f.exists()) {
             f.mkdirs()
         }
-        return f
+        return f!!
     }
 
     /**
@@ -157,8 +154,8 @@ internal object PhotoUtil {
      * @return Bitmap
      */
     fun uri2Bitmap(context: Context, uri: Uri): Bitmap? {
-        var filePath = FileUtils.getFilePathWithUri(context, uri)
-        return path2Bitmap(context, filePath)
+        var filePath = FileUtil.getFilePathWithUri(context, uri)
+        return path2Bitmap(context, filePath!!)
     }
 
     /**
@@ -168,7 +165,7 @@ internal object PhotoUtil {
      * @return Bitmap?
      */
     fun path2Bitmap(context: Context, filePath: String): Bitmap? {
-        var uri = FileUtils.getUriForFile(context, File(filePath))
+        var uri = UriUtil.getUriForFile(context, File(filePath))
         if (uri != null) {
             return MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
         } else {
@@ -249,12 +246,12 @@ internal object PhotoUtil {
         // 第一次解析将inJustDecodeBounds设置为true，来获取图片大小
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
-        BitmapFactory.decodeFile(FileUtils.getFilePathWithUri(context, uri), options)
+        BitmapFactory.decodeFile(FileUtil.getFilePathWithUri(context, uri), options)
         // 调用上面定义的方法计算inSampleSize值
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
         // 使用获取到的inSampleSize值再次解析图片
         options.inJustDecodeBounds = false
-        return BitmapFactory.decodeFile(FileUtils.getFilePathWithUri(context, uri), options)
+        return BitmapFactory.decodeFile(FileUtil.getFilePathWithUri(context, uri), options)
     }
 
     /**
@@ -494,5 +491,25 @@ internal object PhotoUtil {
         options.inJustDecodeBounds = true
         BitmapFactory.decodeFile(filePath, options)
         return options.outWidth !== -1
+    }
+
+
+    @Throws(IOException::class)
+    fun getBitmapFromUri(context: Context, uri: Uri): Bitmap {
+        val parcelFileDescriptor = context.contentResolver.openFileDescriptor(uri, "r")
+        val fileDescriptor = parcelFileDescriptor?.fileDescriptor
+        val image = BitmapFactory.decodeFileDescriptor(fileDescriptor)
+        parcelFileDescriptor?.close()
+        return image
+    }
+
+    @Throws(IOException::class)
+    fun convertGalleryUriToFileProviderUri(context: Context, uri: Uri): Uri {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        val path = PhotoUtil.getTempFile(context).absolutePath // 图片保存路径
+        val fileName = Random().nextInt().toString() + "tmp.jpg"
+        val tmpFile = File(path, fileName)
+        FileUtil.inputStreamToFile(inputStream, tmpFile)
+        return UriUtil.getUriForFile(context, tmpFile)
     }
 }

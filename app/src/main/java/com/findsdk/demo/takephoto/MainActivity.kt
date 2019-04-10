@@ -42,6 +42,9 @@ class MainActivity : AppCompatActivity() {
         pick_from_file_crop.setOnClickListener {
             pickPictureFromFileWithCrop()
         }
+        delete_tmp_dir.setOnClickListener {
+            TakePhotoConfig.clearCache(this)
+        }
 
         TakePhotoConfig.photoDirectoryName = "tmp"
         TakePhotoConfig.languageSetting = "setting"

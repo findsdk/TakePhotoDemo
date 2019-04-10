@@ -3,7 +3,7 @@ package com.findsdk.library.takephoto
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import com.findsdk.library.fileprovider.FileUtils
+import com.findsdk.library.fileprovider.FileUtil
 import com.findsdk.library.takephoto.util.PhotoUtil
 
 /**
@@ -17,8 +17,8 @@ object TakePhotoUtil {
      * @return Bitmap?
      */
     fun uri2Bitmap(context: Context, uri: Uri): Bitmap? {
-        val filePath = FileUtils.getFilePathWithUri(context, uri)
-        return PhotoUtil.path2Bitmap(context, filePath)
+        val filePath = FileUtil.getFilePathWithUri(context, uri)
+        return PhotoUtil.path2Bitmap(context, filePath!!)
 
     }
 
@@ -29,7 +29,7 @@ object TakePhotoUtil {
      * @return String?
      */
     fun uri2FilePath(context: Context, uri: Uri): String? {
-        return FileUtils.getFilePathWithUri(context, uri)
+        return FileUtil.getFilePathWithUri(context, uri)
     }
 
 

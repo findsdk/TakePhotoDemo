@@ -30,7 +30,8 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$support.appcompat_v7"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
-    implementation "com.findsdk.library:fileprovider:1.0.0"
+//    implementation "com.findsdk.library:fileprovider:1.0.0"
+    implementation "com.findsdk.library:fileprovider:1.0.1"
 
 }
 
