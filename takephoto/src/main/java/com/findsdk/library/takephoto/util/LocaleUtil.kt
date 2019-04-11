@@ -13,10 +13,6 @@ internal object LocaleUtil {
         if (TakePhotoConfig.languageSetting.isEmpty()) {
             TakePhotoConfig.languageSetting = context.getString(R.string.setting)
         }
-        if (TakePhotoConfig.languageRequestPermissionsExternalStorageTips.isEmpty()) {
-            TakePhotoConfig.languageRequestPermissionsExternalStorageTips =
-                    context.getString(R.string.request_permissions_external_storage_tips)
-        }
 
         if (TakePhotoConfig.languageRequestPermissionsCameraTips.isEmpty()) {
             TakePhotoConfig.languageRequestPermissionsCameraTips =

@@ -38,7 +38,6 @@ internal object PhotoHelper {
 
     private const val REQUEST_PERMISSION_CAMERA = 348
     private const val REQUEST_PERMISSION_CUSTOM_CAMERA = 349
-    private const val REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE = 350
 
 //        private var instance: PhotoHelper? = null
 //        fun getInstance(context: Context): PhotoHelper {
@@ -313,11 +312,7 @@ internal object PhotoHelper {
         //        this.mActivity = activity;
         isCrop = false
         pickRequestCode = Constants.TAKE_GALLERY
-        if (Build.VERSION.SDK_INT >= 23) {
-            requestPermissionExternalStorage(activity)
-        } else {
-            startPick(activity)
-        }
+        startPick(activity)
     }
 
     /**
@@ -335,11 +330,7 @@ internal object PhotoHelper {
         setSize(width, height)
         isCrop = true
         pickRequestCode = Constants.TAKE_GALLERY_WITH_CROP
-        if (Build.VERSION.SDK_INT >= 23) {
-            requestPermissionExternalStorage(activity)
-        } else {
-            startPick(activity)
-        }
+        startPick(activity)
     }
 
     /**
@@ -349,11 +340,7 @@ internal object PhotoHelper {
     fun pickFromFile(activity: Activity) {
         isCrop = false
         pickRequestCode = Constants.TAKE_FILE
-        if (Build.VERSION.SDK_INT >= 23) {
-            requestPermissionExternalStorage(activity)
-        } else {
-            startPick(activity)
-        }
+        startPick(activity)
     }
 
     /**
@@ -370,11 +357,7 @@ internal object PhotoHelper {
         setSize(width, height)
         isCrop = true
         pickRequestCode = Constants.TAKE_FILE_WITH_CROP
-        if (Build.VERSION.SDK_INT >= 23) {
-            requestPermissionExternalStorage(activity)
-        } else {
-            startPick(activity)
-        }
+        startPick(activity)
     }
 
     private fun showToast(activity: Activity, text: String) {
@@ -403,22 +386,6 @@ internal object PhotoHelper {
                 }
             }
         }
-    }
-
-
-    /**
-     * 请求访问内部存储权限
-     * @param activity Activity
-     */
-    private fun requestPermissionExternalStorage(activity: Activity) {
-//        if (PermissionUtil.requestPermissions(
-//                activity,
-//                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-//                REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE
-//            )
-//        ) {
-        startPick(activity)
-//        }
     }
 
     /**
@@ -545,22 +512,6 @@ internal object PhotoHelper {
                         startCustomCamera(activity)
                     else {
                         showPermissionDialog(activity, TakePhotoConfig.languageRequestPermissionsCameraTips)
-                    }
-                }
-                REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE -> {
-                    var ret = true
-                    for (grantResult in grantResults) {
-                        if (grantResult != PackageManager.PERMISSION_GRANTED) {
-                            ret = false
-                        }
-                    }
-                    if (ret)
-                        startPick(activity)
-                    else {
-                        showPermissionDialog(
-                            activity,
-                            TakePhotoConfig.languageRequestPermissionsExternalStorageTips
-                        )
                     }
                 }
             }

@@ -53,7 +53,6 @@ class MainActivity : AppCompatActivity() {
         TakePhotoConfig.languageNoSDCard = "no sd card"
         TakePhotoConfig.languageNotImage = "not image"
         TakePhotoConfig.languageRequestPermissionsCameraTips = "相机权限"
-        TakePhotoConfig.languageRequestPermissionsExternalStorageTips = "文件权限"
     }
 
     private fun takePhoto() {
