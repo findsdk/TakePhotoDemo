@@ -3,7 +3,7 @@
 1、拍照、选照片库
 包括调用系统相机拍照、剪切、从文件选照片、从相册选照片
 
-    implementation 'com.findsdk.library:takephoto:1.0.0'
+    implementation 'com.findsdk.library:takephoto:1.0.6'
     
     //androidx
     implementation 'com.findsdk.library.androidx:takephoto:0.0.1'
@@ -25,8 +25,47 @@
 
 3、使用方法：
 
-
+    方式一（推荐）：
     
+    TakePhotoHelper.instance.takePhoto(this) {
+          onTakePhoto {
+              showImage(it)
+          }
+     }
+
+    TakePhotoHelper.instance.takePhotoWithCrop(this, width, height) {
+                onTakePhoto {
+                    showImage(it)
+                }
+    }
+    
+    TakePhotoHelper.instance.pickPictureFromGallery(this) {
+                onTakePhoto {
+                    showImage(it)
+                }
+     }
+     
+     TakePhotoHelper.instance.pickPictureFromGalleryWithCrop(this, width, height) {
+                onTakePhoto {
+                    showImage(it)
+                }
+     }
+    
+    TakePhotoHelper.instance.pickPictureFromFile(this) {
+                onTakePhoto {
+                    showImage(it)
+                }
+     }
+     
+     TakePhotoHelper.instance.pickPictureFromFileWithCrop(this, width, height) {
+                onTakePhoto {
+                    showImage(it)
+                }
+      }
+      
+      
+   方式二：
+   
     private fun takePhoto() {
         TakePhotoActivity.takePhoto(this, 100)
     }
@@ -82,7 +121,6 @@
     TakePhotoConfig.languageNoSDCard = "no sd card"
     TakePhotoConfig.languageNotImage = "not Image"
     TakePhotoConfig.languageRequestPermissionsCameraTips = "相机权限"
-    TakePhotoConfig.languageRequestPermissionsExternalStorageTips = "文件权限"
 
     
     可以在activity退出时 删除拍照的临时文件
