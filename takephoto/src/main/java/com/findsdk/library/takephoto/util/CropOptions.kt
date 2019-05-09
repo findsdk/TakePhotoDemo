@@ -12,14 +12,8 @@ internal class CropOptions {
 
     var outputY: Int = 0
 
-    constructor()
-
     class Builder {
-        private val options: CropOptions
-
-        init {
-            options = CropOptions()
-        }
+        private val options: CropOptions = CropOptions()
 
         fun setAspectX(aspectX: Int): Builder {
             options.aspectX = aspectX

@@ -165,11 +165,11 @@ internal object PhotoUtil {
      * @return Bitmap?
      */
     fun path2Bitmap(context: Context, filePath: String): Bitmap? {
-        var uri = UriUtil.getUriForFile(context, File(filePath))
-        if (uri != null) {
-            return MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-        } else {
-            return null
+        val uri = UriUtil.getUriForFile(context, File(filePath))
+        return try {
+            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+        } catch (e: Exception) {
+            null
         }
     }
 

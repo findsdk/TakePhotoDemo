@@ -6,11 +6,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
+import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.findsdk.library.takephoto.TakePhotoActivity
 import com.findsdk.library.takephoto.TakePhotoConfig
+import com.findsdk.library.takephoto.TakePhotoHelper
 import com.findsdk.library.takephoto.TakePhotoUtil
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -19,6 +21,7 @@ class MainActivity : AppCompatActivity() {
     var bitmap: Bitmap? = null
     val width = 300
     val height = 300
+    var useResultListener = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -56,27 +59,75 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun takePhoto() {
-        TakePhotoActivity.takePhoto(this, 100)
+        if (useResultListener) {
+            TakePhotoHelper.instance.takePhoto(this) {
+                onTakePhoto {
+                    showImage(it)
+                }
+            }
+        } else {
+            TakePhotoActivity.takePhoto(this, 100)
+        }
     }
 
     private fun takePhotoWithCrop() {
-        TakePhotoActivity.takePhotoWithCrop(this, width, height, 101)
+        if (useResultListener) {
+            TakePhotoHelper.instance.takePhotoWithCrop(this, width, height) {
+                onTakePhoto {
+                    showImage(it)
+                }
+            }
+        } else {
+            TakePhotoActivity.takePhotoWithCrop(this, width, height, 101)
+        }
     }
 
     private fun pickPictureFromGallery() {
-        TakePhotoActivity.pickPictureFromGallery(this, 200)
+        if (useResultListener) {
+            TakePhotoHelper.instance.pickPictureFromGallery(this) {
+                onTakePhoto {
+                    showImage(it)
+                }
+            }
+        } else {
+            TakePhotoActivity.pickPictureFromGallery(this, 200)
+        }
     }
 
     private fun pickPictureFromGalleryWithCrop() {
-        TakePhotoActivity.pickPictureFromGalleryWithCrop(this, width, height, 201)
+        if (useResultListener) {
+            TakePhotoHelper.instance.pickPictureFromGalleryWithCrop(this, width, height) {
+                onTakePhoto {
+                    showImage(it)
+                }
+            }
+        } else {
+            TakePhotoActivity.pickPictureFromGalleryWithCrop(this, width, height, 201)
+        }
     }
 
     private fun pickPictureFromFile() {
-        TakePhotoActivity.pickPictureFromFile(this, 300)
+        if (useResultListener) {
+            TakePhotoHelper.instance.pickPictureFromFile(this) {
+                onTakePhoto {
+                    showImage(it)
+                }
+            }
+        } else {
+            TakePhotoActivity.pickPictureFromFile(this, 300)
+        }
     }
 
     private fun pickPictureFromFileWithCrop() {
-        TakePhotoActivity.pickPictureFromFileWithCrop(this, width, height, 301)
+        if (useResultListener) {
+            TakePhotoHelper.instance.pickPictureFromFileWithCrop(this, width, height) {
+                onTakePhoto {
+                    showImage(it)
+                }
+            }
+        } else {
+            TakePhotoActivity.pickPictureFromFileWithCrop(this, width, height, 301)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -86,19 +137,8 @@ class MainActivity : AppCompatActivity() {
                 100,
                 101, 200, 201, 300, 301 -> {
                     val uri = data.data
-                    Log.e("===", "===uri ${uri}")
-                    bitmap = TakePhotoUtil.uri2Bitmap(this, uri)
-                    if (bitmap != null) {
-                        image1.setImageBitmap(bitmap)
-                    }
+                    uri?.let { showImage(it) }
                 }
-//                200, 201,300, 301 -> {
-//                    val path = data.getStringExtra("file")
-//                    val bitmap = PhotoUtil.path2Bitmap(this@MainActivity, path)
-//                    if (bitmap != null) {
-//                        image1.setImageBitmap(bitmap)
-//                    }
-//                }
             }
         }
     }
@@ -106,5 +146,12 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         TakePhotoConfig.clearCache(this)
         super.onDestroy()
+    }
+
+    private fun showImage(uri: Uri) {
+        Log.e("===", "===uri $uri")
+        TakePhotoUtil.uri2Bitmap(this@MainActivity, uri)?.let {
+            image1.setImageBitmap(it)
+        }
     }
 }
