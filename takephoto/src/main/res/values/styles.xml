@@ -16,7 +16,7 @@
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">false</item>
     </style>
-    <style name="PhotoModuleAlertDialog" parent="@android:style/Theme.Holo.Light.Dialog">
+    <style name="PhotoModuleAlertDialog" parent="ThemeOverlay.AppCompat.Dialog.Alert">
 
     </style>
 </resources>

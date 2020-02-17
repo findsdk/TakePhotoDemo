@@ -8,7 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import android.text.TextUtils
 import android.widget.Toast
 import com.findsdk.library.fileprovider.FileUtil
@@ -610,7 +610,7 @@ internal object PhotoHelper {
                 //从相册选择照片不裁剪
                 Constants.TAKE_GALLERY -> {
                     val galleryUri = data!!.data
-                    val uri = PhotoUtil.convertGalleryUriToFileProviderUri(activity, galleryUri)
+                    val uri = PhotoUtil.convertGalleryUriToFileProviderUri(activity, galleryUri!!)
                     val filePath = FileUtil.getFilePathWithUri(activity, uri)
                     if (!PhotoUtil.isImageFile(activity, filePath)) {
                         notImageFile(activity)
@@ -621,7 +621,7 @@ internal object PhotoHelper {
                 //从相册选择照片并裁剪
                 Constants.TAKE_GALLERY_WITH_CROP -> {
                     val galleryUri = data!!.data
-                    val uri = PhotoUtil.convertGalleryUriToFileProviderUri(activity, galleryUri)
+                    val uri = PhotoUtil.convertGalleryUriToFileProviderUri(activity, galleryUri!!)
                     val filePath = FileUtil.getFilePathWithUri(activity, uri)
                     if (!PhotoUtil.isImageFile(activity, filePath)) {
                         notImageFile(activity)
@@ -632,7 +632,7 @@ internal object PhotoHelper {
                 //从文件选择照片不裁剪
                 Constants.TAKE_FILE -> {
                     val uri = data!!.data
-                    val filePath = FileUtil.getFilePathWithDocumentsUri(activity, uri)
+                    val filePath = FileUtil.getFilePathWithDocumentsUri(activity, uri!!)
                     if (!PhotoUtil.isImageFile(activity, filePath)) {
                         notImageFile(activity)
                         return
@@ -643,7 +643,7 @@ internal object PhotoHelper {
                 //从文件选择照片，并裁剪
                 Constants.TAKE_FILE_WITH_CROP -> {
                     val uri = data!!.data
-                    val filePath = FileUtil.getFilePathWithDocumentsUri(activity, uri)
+                    val filePath = FileUtil.getFilePathWithDocumentsUri(activity, uri!!)
                     if (!PhotoUtil.isImageFile(activity, filePath)) {
                         notImageFile(activity)
                         return
