@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <paths>
+        <root-path path="." name="file_path" />
+<!--        <files-path  path="." name="root" />-->
+        <files-path  path="tp_images" name="tp_images" />
+<!--        <external-path name="tp_images" path="Pictures" />-->
+    </paths>
+</resources>

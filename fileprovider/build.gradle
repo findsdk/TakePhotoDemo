@@ -1,0 +1,48 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+ext {
+    PUBLISH_ARTIFACT_ID = 'fileprovider'
+}
+android {
+    compileSdkVersion sdk.compileSdkVersion
+
+    compileOptions {
+        kotlinOptions.freeCompilerArgs += ['-module-name', "$APPLICATION_ID.$PUBLISH_ARTIFACT_ID"]
+    }
+    defaultConfig {
+        minSdkVersion rootProject.sdk.minSdkVersion
+        targetSdkVersion rootProject.sdk.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true//混淆
+            zipAlignEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+}

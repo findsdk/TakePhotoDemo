@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import com.findsdk.library.fileprovider.FileUtil
-import com.findsdk.library.takephoto.util.PhotoUtil
+import com.findsdk.library.takephoto.util.TpUtil
 
 /**
  * Created by bvb on 2018/12/28.
@@ -18,7 +18,7 @@ object TakePhotoUtil {
      */
     fun uri2Bitmap(context: Context, uri: Uri): Bitmap? {
         val filePath = FileUtil.getFilePathWithUri(context, uri)
-        return PhotoUtil.path2Bitmap(context, filePath!!)
+        return TpUtil.path2Bitmap(context, filePath!!)
 
     }
 

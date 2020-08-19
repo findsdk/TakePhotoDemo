@@ -1,1 +1,1 @@
-include ':app', ':takephoto'
+include ':app', ':takephoto',':fileprovider'

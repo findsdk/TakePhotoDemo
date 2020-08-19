@@ -11,10 +11,11 @@ import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
 import android.text.TextUtils
+import android.util.Log
 import android.widget.Toast
 import com.findsdk.library.takephoto.util.Constants
 import com.findsdk.library.takephoto.util.LocaleUtil
-import com.findsdk.library.takephoto.util.PhotoHelper
+import com.findsdk.library.takephoto.util.TpHelper
 
 /**
  * Created by bvb on 2018/12/28.
@@ -36,7 +37,7 @@ class TakePhotoActivity : Activity() {
          */
         fun takePhoto(context: Activity, requestCode: Int) {
             val intent = Intent(context, TakePhotoActivity::class.java)
-            intent.putExtra(KEY_TYPE, PhotoHelper.REQUEST_CODE_TAKE_PHOTO)
+            intent.putExtra(KEY_TYPE, Constants.TAKE_PHOTO)
             startActivity(context, intent, requestCode)
         }
 
@@ -53,7 +54,7 @@ class TakePhotoActivity : Activity() {
          */
         fun takePhotoWithCrop(context: Activity, width: Int, height: Int, requestCode: Int) {
             val intent = Intent(context, TakePhotoActivity::class.java)
-            intent.putExtra(KEY_TYPE, PhotoHelper.REQUEST_CODE_TAKE_PHOTO_WITH_CROP)
+            intent.putExtra(KEY_TYPE, Constants.TAKE_PHOTO_WITH_CROP)
             intent.putExtra(KEY_WIDTH, width)
             intent.putExtra(KEY_HEIGHT, height)
             startActivity(context, intent, requestCode)
@@ -70,7 +71,7 @@ class TakePhotoActivity : Activity() {
          */
         fun pickPictureFromGallery(context: Activity, requestCode: Int) {
             val intent = Intent(context, TakePhotoActivity::class.java)
-            intent.putExtra(KEY_TYPE, PhotoHelper.REQUEST_CODE_SELECT_FROM_GALLERY)
+            intent.putExtra(KEY_TYPE, Constants.PICK_FROM_GALLERY)
             startActivity(context, intent, requestCode)
         }
 
@@ -85,9 +86,14 @@ class TakePhotoActivity : Activity() {
          * @param height Int
          * @param requestCode Int
          */
-        fun pickPictureFromGalleryWithCrop(context: Activity, width: Int, height: Int, requestCode: Int) {
+        fun pickPictureFromGalleryWithCrop(
+            context: Activity,
+            width: Int,
+            height: Int,
+            requestCode: Int
+        ) {
             val intent = Intent(context, TakePhotoActivity::class.java)
-            intent.putExtra(KEY_TYPE, PhotoHelper.REQUEST_CODE_SELECT_FROM_GALLERY_WITH_CROP)
+            intent.putExtra(KEY_TYPE, Constants.PICK_FROM_GALLERY_WITH_CROP)
             intent.putExtra(KEY_WIDTH, width)
             intent.putExtra(KEY_HEIGHT, height)
             startActivity(context, intent, requestCode)
@@ -104,7 +110,7 @@ class TakePhotoActivity : Activity() {
          */
         fun pickPictureFromFile(context: Activity, requestCode: Int) {
             val intent = Intent(context, TakePhotoActivity::class.java)
-            intent.putExtra(KEY_TYPE, PhotoHelper.REQUEST_CODE_SELECT_FROM_FILE)
+            intent.putExtra(KEY_TYPE, Constants.PICK_FROM_FILE)
             startActivity(context, intent, requestCode)
         }
 
@@ -119,9 +125,14 @@ class TakePhotoActivity : Activity() {
          * @param height Int
          * @param requestCode Int
          */
-        fun pickPictureFromFileWithCrop(context: Activity, width: Int, height: Int, requestCode: Int) {
+        fun pickPictureFromFileWithCrop(
+            context: Activity,
+            width: Int,
+            height: Int,
+            requestCode: Int
+        ) {
             val intent = Intent(context, TakePhotoActivity::class.java)
-            intent.putExtra(KEY_TYPE, PhotoHelper.REQUEST_CODE_SELECT_FROM_FILE_WITH_CROP)
+            intent.putExtra(KEY_TYPE, Constants.PICK_FROM_FILE_WITH_CROP)
             intent.putExtra(KEY_WIDTH, width)
             intent.putExtra(KEY_HEIGHT, height)
             startActivity(context, intent, requestCode)
@@ -131,9 +142,10 @@ class TakePhotoActivity : Activity() {
             pickPictureFromFileWithCrop(context, width, height, DEFAULT_REQUEST_CODE)
         }
 
+
         fun takePhotoUseCustomCamera(context: Activity, requestCode: Int, cameraType: Int) {
             val intent = Intent(context, TakePhotoActivity::class.java)
-            intent.putExtra(KEY_TYPE, PhotoHelper.REQUEST_CODE_TAKE_CUSTOM_PHOTO)
+            intent.putExtra(KEY_TYPE, Constants.TAKE_PHOTO_USE_CUSTOM_CAMERA)
             intent.putExtra(Constants.INTENT_KEY.CAMERA_FACING_TYPE, cameraType)
             startActivity(context, intent, requestCode)
         }
@@ -150,18 +162,33 @@ class TakePhotoActivity : Activity() {
             cameraType: Int
         ) {
             val intent = Intent(context, TakePhotoActivity::class.java)
-            intent.putExtra(KEY_TYPE, PhotoHelper.REQUEST_CODE_TAKE_CUSTOM_PHOTO_WITH_CROP)
+            intent.putExtra(KEY_TYPE, Constants.TAKE_PHOTO_USE_CUSTOM_CAMERA_WITH_CROP)
             intent.putExtra(KEY_WIDTH, width)
             intent.putExtra(KEY_HEIGHT, height)
             intent.putExtra(Constants.INTENT_KEY.CAMERA_FACING_TYPE, cameraType)
             startActivity(context, intent, requestCode)
         }
 
-        internal fun takePhotoUseCustomCameraWithCrop(context: Activity, width: Int, height: Int, cameraType: Int) {
-            takePhotoUseCustomCameraWithCrop(context, width, height, DEFAULT_REQUEST_CODE, cameraType)
+        internal fun takePhotoUseCustomCameraWithCrop(
+            context: Activity,
+            width: Int,
+            height: Int,
+            cameraType: Int
+        ) {
+            takePhotoUseCustomCameraWithCrop(
+                context,
+                width,
+                height,
+                DEFAULT_REQUEST_CODE,
+                cameraType
+            )
         }
 
-        private fun startActivity(context: Activity, intent: Intent, requestCode: Int = DEFAULT_REQUEST_CODE) {
+        private fun startActivity(
+            context: Activity,
+            intent: Intent,
+            requestCode: Int = DEFAULT_REQUEST_CODE
+        ) {
             if (requestCode == DEFAULT_REQUEST_CODE) {
                 context.startActivity(intent)
             } else {
@@ -186,38 +213,30 @@ class TakePhotoActivity : Activity() {
             val width = intent.getIntExtra(KEY_WIDTH, -1)
             val height = intent.getIntExtra(KEY_HEIGHT, -1)
             when (key) {
-                PhotoHelper.REQUEST_CODE_TAKE_PHOTO -> PhotoHelper.takePhoto(this@TakePhotoActivity)
-                PhotoHelper.REQUEST_CODE_TAKE_PHOTO_WITH_CROP -> PhotoHelper.takePhotoWithCrop(
-                    this@TakePhotoActivity,
-                    width,
-                    height
-                )
-                PhotoHelper.REQUEST_CODE_SELECT_FROM_GALLERY -> PhotoHelper.pickFromGallery(
-                    this@TakePhotoActivity
-                )
-                PhotoHelper.REQUEST_CODE_SELECT_FROM_GALLERY_WITH_CROP -> PhotoHelper.pickFromGalleryWithCrop(
-                    this@TakePhotoActivity,
-                    width,
-                    height
-                )
-                PhotoHelper.REQUEST_CODE_SELECT_FROM_FILE -> PhotoHelper.pickFromFile(
-                    this@TakePhotoActivity
-                )
-                PhotoHelper.REQUEST_CODE_SELECT_FROM_FILE_WITH_CROP -> PhotoHelper.pickFromFileWithCrop(
-                    this@TakePhotoActivity,
-                    width,
-                    height
-                )
-                PhotoHelper.REQUEST_CODE_TAKE_CUSTOM_PHOTO -> {
-
-                    PhotoHelper.takeCustomPhoto(
-                        this@TakePhotoActivity,
-                        intent.getIntExtra(
-                            Constants.INTENT_KEY.CAMERA_FACING_TYPE,
-                            Constants.CAMERA_FACING_TYPE.CAMERA_BACK
-                        )
-                    )
-                }
+                Constants.TAKE_PHOTO -> TpHelper.instance.takePhoto(this@TakePhotoActivity)
+                Constants.TAKE_PHOTO_WITH_CROP -> TpHelper.instance.takePhotoWithCrop(this@TakePhotoActivity, width, height)
+                Constants.PICK_FROM_GALLERY -> TpHelper.instance.pickFromGallery(this@TakePhotoActivity)
+                Constants.PICK_FROM_GALLERY_WITH_CROP -> TpHelper.instance.pickFromGalleryWithCrop(this@TakePhotoActivity, width, height)
+                Constants.PICK_FROM_FILE -> TpHelper.instance.pickFromFile(this@TakePhotoActivity)
+                Constants.PICK_FROM_FILE_WITH_CROP -> TpHelper.instance.pickFromFileWithCrop(this@TakePhotoActivity, width, height)
+//                Constants.TAKE_PHOTO_USE_CUSTOM_CAMERA -> {
+//                    PhotoHelper.takeCustomPhoto(
+//                        this@TakePhotoActivity,
+//                        intent.getIntExtra(
+//                            Constants.INTENT_KEY.CAMERA_FACING_TYPE,
+//                            Constants.CAMERA_FACING_TYPE.CAMERA_BACK
+//                        )
+//                    )
+//                }
+//                Constants.TAKE_PHOTO_USE_CUSTOM_CAMERA_WITH_CROP -> {
+//                    PhotoHelper.takeCustomPhoto(
+//                        this@TakePhotoActivity,
+//                        intent.getIntExtra(
+//                            Constants.INTENT_KEY.CAMERA_FACING_TYPE,
+//                            Constants.CAMERA_FACING_TYPE.CAMERA_BACK
+//                        )
+//                    )
+//                }
                 else -> finish()
 
             }
@@ -263,18 +282,17 @@ class TakePhotoActivity : Activity() {
 
     private fun getPhoto(uri: Uri) {
         showProgressBar()
-        PhotoHelper.compress(this, uri)
+        TpHelper.instance.compress(this, uri)
     }
 
-    @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        PhotoHelper.onActivityResult(this, requestCode, resultCode, intent)
+        TpHelper.instance.onActivityResult(this, requestCode, resultCode, intent)
         super.onActivityResult(requestCode, resultCode, intent)
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        PhotoHelper.onRequestPermissionsResult(this, requestCode, permissions, grantResults)
+        TpHelper.instance.onRequestPermissionsResult(this, requestCode, permissions, grantResults)
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
@@ -288,28 +306,22 @@ class TakePhotoActivity : Activity() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
                 Constants.ACTION_PHOTO_RESULT -> run {
-                    val uriString = intent.getStringExtra("uri")
-                    if (!TextUtils.isEmpty(uriString)) {
-                        Uri.parse(uriString)?.let {
-                            getPhoto(it)
-                            return@run
-                        }
+                    intent.getParcelableExtra<Uri>("uri")?.let {
+                        getPhoto(it)
+                        return@run
                     }
                     val message = intent.getStringExtra("message")
                     showError(message)
                     finish()
                 }
                 Constants.ACTION_PHOTO_COMPRESS -> run {
-                    val uriString = intent.getStringExtra("uri")
-                    if (!TextUtils.isEmpty(uriString)) {
-                        Uri.parse(uriString)?.let {
-                            val result = Intent()
-                            result.data = it
-                            setResult(Activity.RESULT_OK, result)
-                            TakePhotoHelper.instance.updateResult(it)
-                            finish()
-                            return@run
-                        }
+                    intent.getParcelableExtra<Uri>("uri")?.let {
+                        val result = Intent()
+                        result.data = it
+                        setResult(Activity.RESULT_OK, result)
+                        TakePhotoHelper.instance.updateResult(it)
+                        finish()
+                        return@run
                     }
                     val message = intent.getStringExtra("message")
                     message?.let {

@@ -2,11 +2,9 @@ package com.findsdk.library.takephoto.util
 
 import android.content.Context
 import android.os.Environment
-import android.util.Log
 import com.findsdk.library.fileprovider.FileUtil
 import com.findsdk.library.takephoto.TakePhotoConfig
 import java.io.File
-import java.nio.file.Files.isDirectory
 
 
 /**
@@ -18,7 +16,7 @@ internal object StorageUtil {
      *
      * @return
      */
-    fun isSDCardEnable(): Boolean {
+    fun isExternalStorageEnable(): Boolean {
         return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
     }
 

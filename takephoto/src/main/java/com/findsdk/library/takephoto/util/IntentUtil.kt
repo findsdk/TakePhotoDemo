@@ -1,11 +1,14 @@
 package com.findsdk.library.takephoto.util
 
+import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.text.TextUtils
+
 
 /**
  * Created by bvb on 2018/12/27.
@@ -19,7 +22,7 @@ internal object IntentUtil {
      * @param options CropOptions
      * @return Intent
      */
-    fun getCropIntent(targetUri: Uri, outPutUri: Uri, options: CropOptions): Intent {
+    fun getCropIntent(targetUri: Uri, outputUri: Uri, options: CropOptions): Intent {
         val isReturnData = isReturnData()
         //        Log.w(TAG, "getCaptureIntentWithCrop:isReturnData:" + (isReturnData ? "true" : "false"));
         val intent = Intent("com.android.camera.action.CROP")
@@ -35,10 +38,36 @@ internal object IntentUtil {
             intent.putExtra("outputY", options.outputY)
         }
         intent.putExtra("scale", true)
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, outPutUri)
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, outputUri)
         intent.putExtra("return-data", isReturnData)
         intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString())
         intent.putExtra("noFaceDetection", true) // no face detection
+        return intent
+    }
+
+    fun getPickWithCropIntent(outPutUri: Uri, options: CropOptions): Intent {
+        val intent = Intent(
+            Intent.ACTION_PICK,
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        )
+        intent.type = "image/*"
+        intent.putExtra("crop", "true")
+        if (options.aspectX * options.aspectY > 0) {
+            intent.putExtra("aspectX", options.aspectX)
+            intent.putExtra("aspectY", options.aspectY)
+        }
+        if (options.outputX * options.outputY > 0) {
+            intent.putExtra("outputX", options.outputX)
+            intent.putExtra("outputY", options.outputY)
+        }
+        intent.putExtra("scale", true)
+        intent.putExtra("scaleUpIfNeeded", true) //learn it from gallery2 source code
+
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, outPutUri)
+        intent.putExtra(
+            "outputFormat",
+            Bitmap.CompressFormat.JPEG.toString()
+        )
         return intent
     }
 
@@ -57,14 +86,12 @@ internal object IntentUtil {
     }
 
     /**
+     * AAAAAAAAAAAAA
      * 获取拍照的Intent
      * @param outPutUri Uri
      * @return Intent
      */
     fun getCaptureIntent(outPutUri: Uri): Intent {
-        //        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//        intent.action = MediaStore.ACTION_IMAGE_CAPTURE//设置Action为拍照
-//        intent.putExtra(MediaStore.EXTRA_OUTPUT, outPutUri)//将拍取的照片保存到指定URI
         return Intent().apply {
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
             action = MediaStore.ACTION_IMAGE_CAPTURE
@@ -96,5 +123,15 @@ internal object IntentUtil {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
         return intent
+    }
+
+    /**
+     * @param activity Activity
+     * @param intent Intent
+     * @return Boolean
+     */
+    fun hasIntentActivities(activity: Activity, intent: Intent): Boolean {
+        val result = activity.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+        return result.isNotEmpty()
     }
 }

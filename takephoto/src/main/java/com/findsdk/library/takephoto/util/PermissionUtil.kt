@@ -8,7 +8,20 @@ import androidx.core.app.ActivityCompat
  * Created by bvb on 2016/10/26.
  */
 internal object PermissionUtil {
-    fun requestPermissions(activity: Activity, permissions: Array<String>, requestCode: Int): Boolean {
+
+    fun hasPermission(activity: Activity, permission: String): Boolean {
+        return ActivityCompat.checkSelfPermission(
+            activity,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+
+    fun requestPermissions(
+        activity: Activity,
+        permissions: Array<String>,
+        requestCode: Int
+    ): Boolean {
         val per = checkPermission(activity, permissions)
         var i = 0
         for (b in per) {
@@ -34,7 +47,11 @@ internal object PermissionUtil {
         val per = ByteArray(permissions.size)
         for ((i, permission) in permissions.withIndex()) {
             var b: Byte = 0
-            if (ActivityCompat.checkSelfPermission(activity, permission) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(
+                    activity,
+                    permission
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
                 b = if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
                     2
                 } else {

@@ -15,7 +15,7 @@ object TakePhotoConfig {
 
     var languageRequestPermissionsCameraTips: String = ""
 
-    var languageNoSDCard: String = ""
+    var languageExternalStorageDisable: String = ""
 
     var languageDirCreateFailure: String = ""
 

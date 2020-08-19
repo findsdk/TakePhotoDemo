@@ -1,10 +1,7 @@
 package com.findsdk.library.takephoto
 
 import android.app.Activity
-import android.content.Intent
 import android.net.Uri
-import com.findsdk.library.takephoto.util.Constants
-import com.findsdk.library.takephoto.util.PhotoHelper
 
 /**
  * Created by bvb on 2019/5/9.

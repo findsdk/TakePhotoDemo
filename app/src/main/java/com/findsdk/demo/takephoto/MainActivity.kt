@@ -1,25 +1,30 @@
 package com.findsdk.demo.takephoto
 
 import android.app.Activity
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider.getUriForFile
+import com.findsdk.library.fileprovider.FileUtil
+import com.findsdk.library.fileprovider.UriUtil
 import com.findsdk.library.takephoto.TakePhotoActivity
 import com.findsdk.library.takephoto.TakePhotoConfig
 import com.findsdk.library.takephoto.TakePhotoHelper
 import com.findsdk.library.takephoto.TakePhotoUtil
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
+import java.security.AccessController.getContext
+
 
 class MainActivity : AppCompatActivity() {
 
     var bitmap: Bitmap? = null
-    val width = 300
+    val width = 400
     val height = 300
     var useResultListener = true
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,9 +32,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         takephoto.setOnClickListener {
             takePhoto()
+//            test()
         }
         takephoto_crop.setOnClickListener {
             takePhotoWithCrop()
+//            test()
         }
 
         pick_from_gallery.setOnClickListener {
@@ -53,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         TakePhotoConfig.languageSetting = "setting"
         TakePhotoConfig.languageDirCreateFailure = "dir create fail"
         TakePhotoConfig.languageNoCamera = "no camera"
-        TakePhotoConfig.languageNoSDCard = "no sd card"
+        TakePhotoConfig.languageExternalStorageDisable = "no sd card"
         TakePhotoConfig.languageNotImage = "not image"
         TakePhotoConfig.languageRequestPermissionsCameraTips = "相机权限"
     }
@@ -149,9 +156,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showImage(uri: Uri) {
-        Log.e("===", "===uri $uri")
         TakePhotoUtil.uri2Bitmap(this@MainActivity, uri)?.let {
             image1.setImageBitmap(it)
         }
+    }
+
+    private fun test() {
+//        val imagePath = File(filesDir, "images")
+        val dir = getExternalFilesDir(null)
+        val imagePath = File(dir, "tp_images")
+//        val imagePath = FileUtil.getImageDir(this)
+        val newFile = File(imagePath, "default_image.jpg")
+        val contentUri =
+            getUriForFile(this, "$packageName.fileprovider", newFile)
+        val uri = UriUtil.getUriForFile(this, newFile)
+        val uri2 = UriUtil.convertFileUriToFileProviderUri(this, uri)
+        Log.e("===", "===f0===${newFile.absolutePath}")
+        Log.e("===", "===f1===${Uri.fromFile(newFile)}")
+        Log.e("===", "===f1===${contentUri}")
+        Log.e("===", "===44444===${uri}")
+        Log.e("===", "===55555===${uri2}")
     }
 }

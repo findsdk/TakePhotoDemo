@@ -18,8 +18,8 @@ internal object LocaleUtil {
             TakePhotoConfig.languageRequestPermissionsCameraTips =
                     context.getString(R.string.request_permissions_camera_tips)
         }
-        if (TakePhotoConfig.languageNoSDCard.isEmpty()) {
-            TakePhotoConfig.languageNoSDCard = context.getString(R.string.no_sd_card)
+        if (TakePhotoConfig.languageExternalStorageDisable.isEmpty()) {
+            TakePhotoConfig.languageExternalStorageDisable = context.getString(R.string.no_sd_card)
         }
         if (TakePhotoConfig.languageDirCreateFailure.isEmpty()) {
             TakePhotoConfig.languageDirCreateFailure = context.getString(R.string.dir_create_failure)

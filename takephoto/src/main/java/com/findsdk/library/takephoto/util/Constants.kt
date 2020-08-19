@@ -4,42 +4,53 @@ package com.findsdk.library.takephoto.util
  * Created by bvb on 2016/10/26.
  */
 internal object Constants {
+
+
     /**
-     * 使用系统相机
+     * 裁剪结果
      */
-    const val USE_CAMERA = 1
+    const val CROP_RESULT = 1
+
     /**
-     * 使用系统相机并裁剪
+     * 拍照
      */
-    const val USE_CAMERA_WITH_CROP = USE_CAMERA + 1
-    /**
-     * 从相册选择
-     */
-    const val TAKE_GALLERY = USE_CAMERA_WITH_CROP + 1
-    /**
-     * 从相册选择并裁剪
-     */
-    const val TAKE_GALLERY_WITH_CROP = TAKE_GALLERY + 1
+    const val TAKE_PHOTO = CROP_RESULT + 1
+
     /**
      * 拍照并裁剪
      */
-    const val TAKE_PHOTO_WITH_CROP = TAKE_GALLERY_WITH_CROP + 1
+    const val TAKE_PHOTO_WITH_CROP = TAKE_PHOTO + 1
+
+    /**
+     * 从相册选择
+     */
+    const val PICK_FROM_GALLERY = TAKE_PHOTO_WITH_CROP + 1
+
+    /**
+     * 从相册选择并裁剪
+     */
+    const val PICK_FROM_GALLERY_WITH_CROP = PICK_FROM_GALLERY + 1
+
     /**
      * 从文件中选择
      */
-    const val TAKE_FILE = TAKE_PHOTO_WITH_CROP + 1
+    const val PICK_FROM_FILE = PICK_FROM_GALLERY_WITH_CROP + 1
+
     /**
      * 从文件中选择并裁剪
      */
-    const val TAKE_FILE_WITH_CROP = TAKE_FILE + 1
+    const val PICK_FROM_FILE_WITH_CROP = PICK_FROM_FILE + 1
+
     /**
      * 使用自定义相机
      */
-    const val USE_CUSTOM_CAMERA = TAKE_FILE_WITH_CROP + 1
+    const val TAKE_PHOTO_USE_CUSTOM_CAMERA = PICK_FROM_FILE_WITH_CROP + 1
+
     /**
      * 使用自定义相机并裁剪
      */
-    const val USE_CUSTOM_CAMERA_WITH_CROP = USE_CUSTOM_CAMERA + 1
+    const val TAKE_PHOTO_USE_CUSTOM_CAMERA_WITH_CROP = TAKE_PHOTO_USE_CUSTOM_CAMERA + 1
+
 
     /**
      * 广播action
