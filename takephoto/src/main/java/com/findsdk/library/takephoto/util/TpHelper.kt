@@ -11,9 +11,13 @@ import android.os.Build
 import android.text.TextUtils
 import android.util.Log
 import androidx.annotation.RequiresApi
-import com.findsdk.library.fileprovider.FileUtil
-import com.findsdk.library.fileprovider.UriUtil
 import com.findsdk.library.takephoto.TakePhotoConfig
+import com.findsdk.library.takephoto.fileprovider.FileUtil
+import com.findsdk.library.takephoto.fileprovider.UriUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
@@ -222,7 +226,7 @@ internal class TpHelper private constructor() {
                     tmpCameraUri?.let {
                         sendResult(activity, it, null)
                         tmpCameraUri = null
-                    }?: kotlin.run {
+                    } ?: kotlin.run {
                         sendResult(activity, null, null)
                     }
                 }
@@ -240,7 +244,7 @@ internal class TpHelper private constructor() {
                     tmpCropUri?.let {
                         sendResult(activity, it, null)
                         tmpCropUri = null
-                    }?: kotlin.run {
+                    } ?: kotlin.run {
                         sendResult(activity, null, null)
                     }
                 }
@@ -343,17 +347,34 @@ internal class TpHelper private constructor() {
 
     //----------compress begin------------
     fun compress(context: Context, uri: Uri) {
-        val bitmap = CompressUtil.getRotatedBitmap(
-            FileUtil.getFileWithUri(context, uri)!!.absolutePath,
-            Constants.IMAGE_SIZE.UPLOAD_MAX_SIZE,
-            Constants.IMAGE_SIZE.UPLOAD_MAX_WIDTH,
-            Constants.IMAGE_SIZE.UPLOAD_MAX_HEIGHT
-        )
-        bitmap?.let {
-            TpUtil.saveBitmapFile(context, it)?.let { file ->
-                sendCompress(context, UriUtil.getUriForFile(context, file), null)
+        MainScope().launch {
+            val fileUri = withContext(Dispatchers.IO) {
+                val bitmap = CompressUtil.getRotatedBitmap(
+                    FileUtil.getFileWithUri(context, uri)!!.absolutePath,
+                    Constants.IMAGE_SIZE.UPLOAD_MAX_SIZE,
+                    Constants.IMAGE_SIZE.UPLOAD_MAX_WIDTH,
+                    Constants.IMAGE_SIZE.UPLOAD_MAX_HEIGHT
+                )
+                bitmap?.let {
+                    TpUtil.saveBitmapFile(context, it)?.let { file ->
+                        UriUtil.getUriForFile(context, file)
+                    }
+                }
             }
-        } ?: sendCompress(context, null, null)
+            sendCompress(context, fileUri, null)
+        }
+
+//        val bitmap = CompressUtil.getRotatedBitmap(
+//            FileUtil.getFileWithUri(context, uri)!!.absolutePath,
+//            Constants.IMAGE_SIZE.UPLOAD_MAX_SIZE,
+//            Constants.IMAGE_SIZE.UPLOAD_MAX_WIDTH,
+//            Constants.IMAGE_SIZE.UPLOAD_MAX_HEIGHT
+//        )
+//        bitmap?.let {
+//            TpUtil.saveBitmapFile(context, it)?.let { file ->
+//                sendCompress(context, UriUtil.getUriForFile(context, file), null)
+//            }
+//        } ?: sendCompress(context, null, null)
 
     }
 

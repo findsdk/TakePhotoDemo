@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.findsdk.library.takephoto">
+        xmlns:tools="http://schemas.android.com/tools"
+        package="com.findsdk.library.takephoto">
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
 
@@ -14,7 +15,18 @@
             android:supportsRtl="true">
         <activity
                 android:name=".TakePhotoActivity"
-                android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"></activity>
+                android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
+        <provider
+                android:name="androidx.core.content.FileProvider"
+                android:authorities="${applicationId}.fileprovider"
+                android:exported="false"
+                android:grantUriPermissions="true"
+                tools:replace="android:authorities">
+            <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/file_paths"
+                    />
+        </provider>
     </application>
 
 </manifest>

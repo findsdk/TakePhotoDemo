@@ -104,15 +104,11 @@ internal object IntentUtil {
      * @return Intent
      */
     fun getPickIntentWithGallery(): Intent {
-        val intent = Intent()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            intent.action = Intent.ACTION_OPEN_DOCUMENT
-        } else {
-            intent.action = Intent.ACTION_GET_CONTENT
+        return Intent().apply {
+            action = Intent.ACTION_OPEN_DOCUMENT
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "image/*"//从所有图片中进行选择
         }
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = "image/*"//从所有图片中进行选择
-        return intent
     }
 
     /**
@@ -120,9 +116,10 @@ internal object IntentUtil {
      * @return Intent
      */
     fun getPickIntentWithDocuments(): Intent {
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type = "image/*"
-        return intent
+        return Intent().apply {
+            action = Intent.ACTION_GET_CONTENT
+            type = "image/*"//从所有图片中进行选择
+        }
     }
 
     /**

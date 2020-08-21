@@ -32,6 +32,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
 //    implementation project(":takephoto")
-    implementation project(":fileprovider")
-    implementation 'com.findsdk.library:takephoto:1.1.2'
+//    implementation project(":fileprovider")
+    implementation 'com.findsdk.library:takephoto:1.2.0'
 }

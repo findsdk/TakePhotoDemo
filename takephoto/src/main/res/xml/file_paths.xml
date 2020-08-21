@@ -2,6 +2,6 @@
 <resources>
     <paths>
         <root-path path="" name="file_path" />
-        <external-files-path name="my_images" path="Android/data/${}/files/Pictures" />
+        <files-path  path="tp_images" name="tp_images" />
     </paths>
 </resources>

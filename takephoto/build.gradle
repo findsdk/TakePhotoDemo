@@ -1,9 +1,14 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+ext {
+    PUBLISH_ARTIFACT_ID = 'fileprovider'
+}
 android {
     compileSdkVersion sdk.compileSdkVersion
-
+    compileOptions {
+        kotlinOptions.freeCompilerArgs += ['-module-name', "$APPLICATION_ID.$PUBLISH_ARTIFACT_ID"]
+    }
     defaultConfig {
         minSdkVersion sdk.minSdkVersion
         targetSdkVersion sdk.targetSdkVersion
@@ -30,8 +35,8 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
-//    implementation 'com.findsdk.library:fileprovider:1.1.1'
-    implementation project(":fileprovider")
+    //coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.2"
 
 }
 

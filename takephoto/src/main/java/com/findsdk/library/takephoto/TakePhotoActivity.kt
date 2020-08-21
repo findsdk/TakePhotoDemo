@@ -11,11 +11,11 @@ import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
 import android.text.TextUtils
-import android.util.Log
 import android.widget.Toast
 import com.findsdk.library.takephoto.util.Constants
 import com.findsdk.library.takephoto.util.LocaleUtil
 import com.findsdk.library.takephoto.util.TpHelper
+import com.findsdk.library.takephoto.view.TpLoadingDialog
 
 /**
  * Created by bvb on 2018/12/28.
@@ -259,7 +259,7 @@ class TakePhotoActivity : Activity() {
     private fun showProgressBar() {
         try {
             TakePhotoConfig.dialog?.let { progressDialog = it }
-            progressDialog ?: Dialog(this, R.style.PhotoModuleProgressDialog).also {
+            progressDialog ?: (TpLoadingDialog.makeLoadingDialog(this)).also {
                 progressDialog = it
             }
             progressDialog?.show()
@@ -318,7 +318,7 @@ class TakePhotoActivity : Activity() {
                     intent.getParcelableExtra<Uri>("uri")?.let {
                         val result = Intent()
                         result.data = it
-                        setResult(Activity.RESULT_OK, result)
+                        setResult(RESULT_OK, result)
                         TakePhotoHelper.instance.updateResult(it)
                         finish()
                         return@run

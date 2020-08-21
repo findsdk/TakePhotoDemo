@@ -3,7 +3,7 @@ package com.findsdk.library.takephoto
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import com.findsdk.library.fileprovider.FileUtil
+import com.findsdk.library.takephoto.fileprovider.FileUtil
 import com.findsdk.library.takephoto.util.TpUtil
 
 /**

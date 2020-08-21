@@ -2,8 +2,8 @@ package com.findsdk.library.takephoto.util
 
 import android.content.Context
 import android.os.Environment
-import com.findsdk.library.fileprovider.FileUtil
 import com.findsdk.library.takephoto.TakePhotoConfig
+import com.findsdk.library.takephoto.fileprovider.FileUtil
 import java.io.File
 
 

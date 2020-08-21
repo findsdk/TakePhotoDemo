@@ -6,8 +6,8 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import com.findsdk.library.fileprovider.FileUtil
-import com.findsdk.library.fileprovider.UriUtil
+import com.findsdk.library.takephoto.fileprovider.FileUtil
+import com.findsdk.library.takephoto.fileprovider.UriUtil
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException

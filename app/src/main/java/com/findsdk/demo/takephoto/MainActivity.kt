@@ -1,6 +1,8 @@
 package com.findsdk.demo.takephoto
 
 import android.app.Activity
+import android.app.Dialog
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -8,14 +10,17 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.DialogCompat
 import androidx.core.content.FileProvider.getUriForFile
-import com.findsdk.library.fileprovider.FileUtil
-import com.findsdk.library.fileprovider.UriUtil
+import androidx.fragment.app.DialogFragment
+
 import com.findsdk.library.takephoto.TakePhotoActivity
 import com.findsdk.library.takephoto.TakePhotoConfig
 import com.findsdk.library.takephoto.TakePhotoHelper
 import com.findsdk.library.takephoto.TakePhotoUtil
+import com.findsdk.library.takephoto.util.DialogUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.security.AccessController.getContext
@@ -55,7 +60,8 @@ class MainActivity : AppCompatActivity() {
         delete_tmp_dir.setOnClickListener {
             TakePhotoConfig.clearCache(this)
         }
-
+//        val dialog = AlertDialog.Builder(this).setMessage("loading").create()
+//        TakePhotoConfig.dialog = dialog
         TakePhotoConfig.photoDirectoryName = "tmp"
         TakePhotoConfig.languageSetting = "setting"
         TakePhotoConfig.languageDirCreateFailure = "dir create fail"
@@ -162,19 +168,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun test() {
-//        val imagePath = File(filesDir, "images")
-        val dir = getExternalFilesDir(null)
-        val imagePath = File(dir, "tp_images")
-//        val imagePath = FileUtil.getImageDir(this)
-        val newFile = File(imagePath, "default_image.jpg")
-        val contentUri =
-            getUriForFile(this, "$packageName.fileprovider", newFile)
-        val uri = UriUtil.getUriForFile(this, newFile)
-        val uri2 = UriUtil.convertFileUriToFileProviderUri(this, uri)
-        Log.e("===", "===f0===${newFile.absolutePath}")
-        Log.e("===", "===f1===${Uri.fromFile(newFile)}")
-        Log.e("===", "===f1===${contentUri}")
-        Log.e("===", "===44444===${uri}")
-        Log.e("===", "===55555===${uri2}")
+
+//        TpLoadingDialog.makeLoadingDialog(this,null).show()
+//        Dialog(this, com.findsdk.library.takephoto.R.style.PhotoModuleProgressDialog)
+////        val imagePath = File(filesDir, "images")
+//        val dir = getExternalFilesDir(null)
+//        val imagePath = File(dir, "tp_images")
+////        val imagePath = FileUtil.getImageDir(this)
+//        val newFile = File(imagePath, "default_image.jpg")
+//        val contentUri =
+//            getUriForFile(this, "$packageName.fileprovider", newFile)
+//        val uri = UriUtil.getUriForFile(this, newFile)
+//        val uri2 = UriUtil.convertFileUriToFileProviderUri(this, uri)
+//        Log.e("===", "===f0===${newFile.absolutePath}")
+//        Log.e("===", "===f1===${Uri.fromFile(newFile)}")
+//        Log.e("===", "===f1===${contentUri}")
+//        Log.e("===", "===44444===${uri}")
+//        Log.e("===", "===55555===${uri2}")
     }
 }
