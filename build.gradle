@@ -43,6 +43,12 @@ allprojects {
         maven { url 'https://maven.aliyun.com/repository/jcenter' }
         google()
         jcenter()
+        maven {
+            url "http://nexus.skio.cn/repository/skio-android/"
+        }
+        maven {
+            url "http://nexus.skio.cn/repository/skio-android-snapshot/"
+        }
     }
 }
 

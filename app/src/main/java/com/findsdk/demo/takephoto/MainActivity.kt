@@ -1,5 +1,6 @@
 package com.findsdk.demo.takephoto
 
+import android.Manifest
 import android.app.Activity
 import android.app.Dialog
 import android.app.ProgressDialog
@@ -21,6 +22,7 @@ import com.findsdk.library.takephoto.TakePhotoConfig
 import com.findsdk.library.takephoto.TakePhotoHelper
 import com.findsdk.library.takephoto.TakePhotoUtil
 import com.findsdk.library.takephoto.util.DialogUtil
+import com.venus.library.permission.PermissionManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.security.AccessController.getContext
@@ -40,8 +42,8 @@ class MainActivity : AppCompatActivity() {
 //            test()
         }
         takephoto_crop.setOnClickListener {
-            takePhotoWithCrop()
-//            test()
+//            takePhotoWithCrop()
+            test()
         }
 
         pick_from_gallery.setOnClickListener {
@@ -169,21 +171,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun test() {
 
-//        TpLoadingDialog.makeLoadingDialog(this,null).show()
-//        Dialog(this, com.findsdk.library.takephoto.R.style.PhotoModuleProgressDialog)
-////        val imagePath = File(filesDir, "images")
-//        val dir = getExternalFilesDir(null)
-//        val imagePath = File(dir, "tp_images")
-////        val imagePath = FileUtil.getImageDir(this)
-//        val newFile = File(imagePath, "default_image.jpg")
-//        val contentUri =
-//            getUriForFile(this, "$packageName.fileprovider", newFile)
-//        val uri = UriUtil.getUriForFile(this, newFile)
-//        val uri2 = UriUtil.convertFileUriToFileProviderUri(this, uri)
-//        Log.e("===", "===f0===${newFile.absolutePath}")
-//        Log.e("===", "===f1===${Uri.fromFile(newFile)}")
-//        Log.e("===", "===f1===${contentUri}")
-//        Log.e("===", "===44444===${uri}")
-//        Log.e("===", "===55555===${uri2}")
+        val permissions = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        PermissionManager.instance.requestPermission(this,permissions){
+            onGranted {
+                Log.e("===","===onGranted===")
+            }
+            onDenied {
+                Log.e("===","===onDenied===")
+            }
+        }
     }
 }
