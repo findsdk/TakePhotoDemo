@@ -3,9 +3,9 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <!--<item name="colorPrimary">@color/colorPrimary</item>-->
-        <!--<item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
-        <!--<item name="colorAccent">@color/colorAccent</item>-->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 <!--    <style name="PhotoModuleProgressDialog" parent="Theme.AppCompat.Light.Dialog">-->
 <!--        <item name="android:windowFrame">@null</item>-->
@@ -16,7 +16,6 @@
 <!--        <item name="android:windowBackground">@android:color/transparent</item>-->
 <!--        <item name="android:backgroundDimEnabled">false</item>-->
 <!--    </style>-->
-    <style name="PhotoModuleAlertDialog" parent="ThemeOverlay.AppCompat.Dialog.Alert">
-
+    <style name="PhotoModuleAlertDialog" parent="Theme.AppCompat.Dialog.Alert">
     </style>
 </resources>
