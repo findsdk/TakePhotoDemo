@@ -252,12 +252,16 @@ internal class TpHelper private constructor() {
                 Constants.PICK_FROM_GALLERY -> {
                     data?.data?.let {
                         val uri = TpUtil.convertGalleryUriToFileProviderUri(activity, it)
-                        val filePath = FileUtil.getFilePathWithUri(activity, uri)
-                        if (!TpUtil.isImageFile(activity, filePath)) {
-                            notImageFile(activity)
-                            return
+                        uri?.let {
+                            val filePath = FileUtil.getFilePathWithUri(activity, uri)
+                            if (!TpUtil.isImageFile(activity, filePath)) {
+                                notImageFile(activity)
+                                return
+                            }
+                            sendResult(activity, uri, null)
+                        } ?: kotlin.run {
+                            sendResult(activity, null, null)
                         }
-                        sendResult(activity, uri, null)
                     } ?: kotlin.run {
                         sendResult(activity, null, null)
                     }
@@ -266,12 +270,16 @@ internal class TpHelper private constructor() {
                 Constants.PICK_FROM_GALLERY_WITH_CROP -> {
                     data?.data?.let {
                         val uri = TpUtil.convertGalleryUriToFileProviderUri(activity, it)
-                        val filePath = FileUtil.getFilePathWithUri(activity, uri)
-                        if (!TpUtil.isImageFile(activity, filePath)) {
-                            notImageFile(activity)
-                            return
+                        uri?.let {
+                            val filePath = FileUtil.getFilePathWithUri(activity, uri)
+                            if (!TpUtil.isImageFile(activity, filePath)) {
+                                notImageFile(activity)
+                                return
+                            }
+                            crop(activity, uri)
+                        } ?: kotlin.run {
+                            sendResult(activity, null, null)
                         }
-                        crop(activity, it)
                     } ?: kotlin.run {
                         sendResult(activity, null, null)
                     }

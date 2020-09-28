@@ -76,14 +76,17 @@ internal object TpUtil {
         return null
     }
 
-    @Throws(IOException::class)
-    fun convertGalleryUriToFileProviderUri(context: Context, uri: Uri): Uri {
-        val inputStream = context.contentResolver.openInputStream(uri)
-        val prefix = "pg_${System.currentTimeMillis()}"
-        val suffix = ".jpg"
-        val tmpFile = getTmpImageFile(context, prefix, suffix)
-        FileUtil.inputStreamToFile(inputStream, tmpFile)
-        return UriUtil.getUriForFile(context, tmpFile)
+    fun convertGalleryUriToFileProviderUri(context: Context, uri: Uri): Uri? {
+        return try{
+            val inputStream = context.contentResolver.openInputStream(uri)
+            val prefix = "pg_${System.currentTimeMillis()}"
+            val suffix = ".jpg"
+            val tmpFile = getTmpImageFile(context, prefix, suffix)
+            FileUtil.inputStreamToFile(inputStream, tmpFile)
+            UriUtil.getUriForFile(context, tmpFile)
+        }catch (e:Exception){
+            null
+        }
     }
 
     fun isImageFile(context: Context, filePath: String?): Boolean {
