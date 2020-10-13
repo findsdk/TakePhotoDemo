@@ -24,9 +24,18 @@ internal object PickUtil {
                 IntentUtil.getPickIntentWithGallery()
             else -> null
         }
-        intent?.let {
-            activity.startActivityForResult(it, requestCode)
+        try {
+            intent?.resolveActivity(activity.packageManager)?.let {
+                activity.startActivityForResult(intent, requestCode)
+            } ?: kotlin.run {
+                activity.startActivityForResult(IntentUtil.getPickIntentWithDocuments(), requestCode)
+            }
+        } catch (e: Exception) {
+            activity.startActivityForResult(IntentUtil.getPickIntentWithDocuments(), requestCode)
         }
+//        intent?.let {
+//            activity.startActivityForResult(it, requestCode)
+//        }
     }
 
     fun pickPicture1(activity: Activity, requestCode: Int) {
