@@ -44,6 +44,16 @@ object FileUtil {
     fun getImageDir(context: Context): File {
         val file = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), FileProviderUtil.IMAGES_PATH)
         if (!file.exists()) {
+            if (!file.mkdirs()) {
+                return getCacheImageDir(context)
+            }
+        }
+        return file
+    }
+
+    private fun getCacheImageDir(context: Context): File {
+        val file = File(context.externalCacheDir, FileProviderUtil.IMAGES_PATH)
+        if (!file.exists()) {
             file.mkdirs()
         }
         return file
